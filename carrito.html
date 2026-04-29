@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Carrito</title>
+    <style>
+        
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; }
+        #carrito-display { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        button { background-color: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #128c7e; }
+
+        #carrito-display { 
+    background: white; 
+    padding: 20px; 
+    border-radius: 10px; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+    max-width: 600px; 
+    margin: auto;   
+    text-align: center; 
+}
+
+#lista-productos div {
+    display: flex !important;
+    width: 100% !important;
+    flex-direction: row; 
+}
+
+#lista-productos {
+    display: flex !important;
+    flex-direction: column !important; 
+    align-items: stretch;
+}
+
+    </style>
+</head>
+<body>
+
+    <div id="carrito-display">
+        <h2> Tu Carrito</h2>
+        <div id="lista-productos" style="display: flex; flex-direction:column; gap: 10px;"></div>
+        <p><strong>Total: $<span id="total-precio">0</span></strong></p>
+        <button onclick="enviarPedidoWhatsApp()">Pedir por WhatsApp</button>
+        <button onclick="vaciarCarrito()" style="background-color: #ff4b4b; margin-left: 10px;">Vaciar Carrito</button>
+    </div>
+        
+<script>
+    const URL_BASE_DATOS = "https://script.google.com/macros/s/AKfycbzjVixEyMOKuEPTFq-P9E3T8wsCWUjn2mgMUfgumDNgNiTZhFUU_vvtouCWHfbmb-27/exec";
+
+    let productosGuardados = JSON.parse(localStorage.getItem('mi_carrito')) || [];
+
+    function renderizarCarrito() {
+        const lista = document.getElementById('lista-productos');
+        const totalSpan = document.getElementById('total-precio');
+        let total = 0;
+        lista.innerHTML = "";
+
+        if (productosGuardados.length === 0) {
+            lista.innerHTML = "<p style='text-align:center; color:grey;'>Tu carrito está vacío</p>";
+        } else {
+            productosGuardados.forEach((p, index) => {
+                total += (p.precio * p.cantidad);
+                lista.innerHTML += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: #fff; margin-bottom: 10px; padding: 15px; border-radius: 8px; border: 1px solid #ddd; text-align: left; color: black; width:100%; box-sizing: border-box;">
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                            <strong style="font-size: 1.1rem; color: #333;">${p.nombre}</strong>
+                            <span style="color: #555;">Cantidad: ${p.cantidad} — Precio: $${p.precio}</span>
+                        </div>
+                        <button onclick="eliminarDelCarrito(${index})" style="background-color: red; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; flex-shrink: 0; margin-left:10px;">
+                            Eliminar
+                        </button>
+                    </div>`;
+            });
+        }
+        totalSpan.innerText = total;
+    }
+
+    function eliminarDelCarrito(index) {
+        if (productosGuardados[index].cantidad > 1) {
+            productosGuardados[index].cantidad -= 1;
+        } else {
+            productosGuardados.splice(index, 1);
+        }
+        localStorage.setItem('mi_carrito', JSON.stringify(productosGuardados));
+        renderizarCarrito();
+    }
+
+    function vaciarCarrito() {
+        if(confirm("¿Estás seguro de que quieres vaciar el carrito?")) {
+            productosGuardados = [];
+            localStorage.removeItem('mi_carrito');
+            renderizarCarrito();
+        }
+    }
+
+    // ESTA ES LA FUNCIÓN QUE CAMBIA:
+    async function enviarPedidoWhatsApp() {
+        if (productosGuardados.length === 0) return alert("El carrito está vacío");
+
+        //AQUI ENVIA LA ORDEN AL EXCEL PARA DESCONTAR
+        try {
+            // Envia todas las listas de productos al Excel
+            fetch(URL_BASE_DATOS, {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify({
+                    tipo: "FINALIZAR_PEDIDO",
+                    items: productosGuardados // Aquí envia el ID y la cantidad de cada uno
+                })
+            });
+        } catch (error) {
+            console.error("Error al descontar stock:", error);
+        }
+
+        //AQUI EL MENSAJE DE WHATSAPP ---
+        const miTelefono = "18092186664";
+        let mensaje = "¡Hola! Quisiera realizar el siguiente pedido:\n\n";
+        
+        productosGuardados.forEach(p => {
+            mensaje += `• ${p.nombre} (x${p.cantidad}) - $${p.precio}\n`;
+        });
+        
+        const total = productosGuardados.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
+        mensaje += `\n*TOTAL A PAGAR: $${total}*`;
+        
+        // Abrir WhatsApp
+        const url = `https://api.whatsapp.com/send?phone=${miTelefono}&text=${encodeURIComponent(mensaje)}`;
+        window.open(url, '_blank');
+
+        //Vaciar el carrito después de pedir para que no se repita
+        localStorage.removeItem('mi_carrito');
+        productosGuardados = [];
+        renderizarCarrito();
+    }
+
+    renderizarCarrito();
+</script>
+
+</body>
+</html>

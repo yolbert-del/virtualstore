@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor a PDF PRO</title>
+    <script src="https://cloudflare.com"></script>
+    <script src="https://cloudflare.com"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            flex-direction: column; 
+            align-items: center;    
+            padding-top: 50px;
+            background: #e9ecef;
+        }
+        /* DETECTOR DE RATÓN: La tarjeta reacciona al pasar el mouse */
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid transparent;
+            margin-bottom: 20px;
+        }
+        .card:hover {
+            transform: translateY(-8px); /* Efecto de levitación */
+            box-shadow: 0 15px 30px rgba(0,123,255,0.3); /* Brillo azul */
+            border-color: #007bff;
+        }
+        h2 { color: #333; font-size: 1.2rem; margin-bottom: 10px; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover { background: #0056b3; }
+        textarea {
+            width: 100%;
+            height: 80px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        /* CUADRO DE PREVISUALIZACIÓN */
+        #vistaHTML {
+            border: 2px dashed #007bff;
+            padding: 10px;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            text-align: left;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+        hr { margin: 20px 0; border: 0; border-top: 1px solid #eee; }
+
+    .boton-azul{
+    display: block;
+    background: #283da7; 
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    margin-top: 25px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+.boton-azul:hover{
+    background: #2b2188;
+}
+
+    .boton-verde{
+    display: block;
+    background: #28a72e; 
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    margin-top: 25px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+.boton-verde:hover{
+    background: #218837;
+}
+
+    .boton-rojo{
+    display: block;
+    background: #a72828; 
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    margin-top: 25px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+.boton-rojo:hover{
+    background: #882121;
+}
+
+    </style>
+</head>
+<body> 
+<div class="card">
+    <h2>📄 Texto a PDF</h2>
+    <input type="file" id="archivoTexto" accept=".txt" multiple>
+    <div id="vTexto" class="visor"></div>
+    <textarea id="texto" placeholder="O escribe aquí..."></textarea>
+    <button onclick="limpiarTodo()" style="background: #dc3545; margin-top: 20px;">🗑️ Limpiar Todo</button>
+    <button id="btnTexto" onclick="convertirTexto()">Descargar Texto</button>
+
+    <hr>
+
+    <h2>🖼️ Imágenes a PDF</h2>
+    <input type="file" id="archivoImagen" accept="image/*" multiple>
+    <div id="vImagen" class="visor"></div>
+    <button onclick="limpiarTodo()" style="background: #dc3545; margin-top: 20px;">🗑️ Limpiar Todo</button>
+    <button id="btnImagen" onclick="convertirImagenes()">Descargar Imágenes</button>
+
+    <hr>
+
+    <h2>🌐 HTML a PDF</h2>
+    <input type="file" id="archivoHTML" accept=".html, image/*" multiple>
+    <div id="vHTML" class="visor"></div>
+    <div id="vistaHTML">La previa aparecerá aquí...</div>
+    <button onclick="limpiarTodo()" style="background: #dc3545; margin-top: 20px;">🗑️ Limpiar Todo</button>
+    <button id="btnHTML" onclick="convertirHTML()">Descargar HTML</button>
+</div>
+
+<!-- LIBRERÍAS (CUIDADO: Siempre usa las URLs completas de cdnjs) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cloudflare.com"></script>
+
+<script>
+// --- UTILIDADES ---
+const leer = (f, t) => new Promise(r => { const reader = new FileReader(); reader.onload = e => r(e.target.result); t === 'txt' ? reader.readAsText(f) : reader.readAsDataURL(f); });
+const cargarImg = (src) => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = src; });
+
+// --- VISORES DE CONTEO ---
+const setupVisor = (id, v) => document.getElementById(id).addEventListener("change", e => {
+    document.getElementById(v).innerText = e.target.files.length > 0 ? `✅ ${e.target.files.length} archivos` : "";
+});
+setupVisor("archivoTexto", "vTexto");
+setupVisor("archivoImagen", "vImagen");
+setupVisor("archivoHTML", "vHTML");
+
+// --- LÓGICA DE TEXTO ---
+async function convertirTexto() {
+    const files = document.getElementById("archivoTexto").files;
+    const txt = document.getElementById("texto").value;
+    const btn = document.getElementById("btnTexto");
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    btn.disabled = true; btn.innerText = "⏳...";
+    try {
+        if (files.length > 0) {
+            for (let i = 0; i < files.length; i++) {
+                if (i > 0) doc.addPage();
+                const c = await leer(files[i], 'txt');
+                doc.text(doc.splitTextToSize(c, 180), 10, 10);
+            }
+            doc.save("textos.pdf");
+        } else if (txt) {
+            doc.text(doc.splitTextToSize(txt, 180), 10, 10);
+            doc.save("nota.pdf");
+        }
+    } finally { btn.disabled = false; btn.innerText = "Descargar Texto"; }
+}
+
+// --- LÓGICA DE IMÁGENES ---
+async function convertirImagenes() {
+    const files = document.getElementById("archivoImagen").files;
+    const btn = document.getElementById("btnImagen");
+    if (!files.length) return alert("Sube imágenes");
+    
+    btn.disabled = true; btn.innerText = "⏳...";
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    try {
+        for (let i = 0; i < files.length; i++) {
+            if (i > 0) doc.addPage();
+            const data = await leer(files[i], 'img');
+            const img = await cargarImg(data);
+            doc.addImage(img, 'JPEG', 10, 10, 190, (img.height * 190) / img.width, undefined, 'FAST');
+        }
+        doc.save("imagenes.pdf");
+    } finally { btn.disabled = false; btn.innerText = "Descargar Imágenes"; }
+}
+
+// --- LÓGICA DE HTML (Previa + Vinculación de imágenes) ---
+document.getElementById("archivoHTML").addEventListener("change", async function(e) {
+    const files = Array.from(e.target.files);
+    const htmlFile = files.find(f => f.name.endsWith('.html'));
+    if (htmlFile) {
+        let content = await leer(htmlFile, 'txt');
+        const box = document.getElementById("vistaHTML");
+        box.innerHTML = content;
+        // Vincular imágenes locales si el usuario las subió juntas
+        const imgs = box.querySelectorAll("img");
+        for (let img of imgs) {
+            const f = files.find(file => file.name === img.getAttribute("src"));
+            if (f) img.src = await leer(f, 'img');
+        }
+    }
+});
+
+function convertirHTML() {
+    const contenido = document.getElementById("vistaHTML").innerHTML;
+    if(contenido.includes("previa aparecerá")) return alert("Sube un HTML primero");
+
+    const ventana = window.open('', '', 'height=700,width=900');
+    
+    // Construlle las etiquetas por piezas para que el navegador no las reconozca
+    const h = 'ht' + 'ml';
+    const b = 'bo' + 'dy';
+    
+    ventana.document.write('<' + h + '><head><title>PDF</title>');
+    ventana.document.write('<style>body{font-family:sans-serif;padding:20px;}img{max-width:100%;}</style>');
+    ventana.document.write('</head><' + b + '>');
+    ventana.document.write(contenido);
+    ventana.document.write('</' + b + '></' + h + '>');
+    
+    ventana.document.close();
+    
+    setTimeout(() => {
+        ventana.print();
+        ventana.close();
+    }, 500);
+}
+// --- FUNCIÓN PARA BORRAR TODO ---
+function limpiarTodo() {
+    // Limpia todos los selectores de archivos (inputs)
+    document.getElementById("archivoTexto").value = "";
+    document.getElementById("archivoImagen").value = "";
+    document.getElementById("archivoHTML").value = "";
+
+    // Limpia el área de texto manual
+    document.getElementById("texto").value = "";
+
+    //Resetea los visores de conteo (los que dicen ✅ X archivos)
+    document.getElementById("vTexto").innerText = "";
+    document.getElementById("vImagen").innerText = "";
+    document.getElementById("vHTML").innerText = "";
+
+    // Restaura el mensaje inicial de la previsualización HTML
+    document.getElementById("vistaHTML").innerHTML = "La previa aparecerá aquí...";
+
+    // Pequeño aviso visual de que se borró todo
+    console.log("Formulario reseteado correctamente.");
+}
+</script>
+<div class="card">
+    <h2>Herramientas importantes para proyectos de clase </h2>
+<a href="https://docs.google.com/document/d/1SoIKDtrqI-IAXMFlP-LhzZHPzHRu80Qq7gOzIP0a5G0/edit?hl=es&tab=t.0" class="boton-azul">gogle word</a>
+<a href="https://docs.google.com/spreadsheets/d/1ZM1g113Vmw-jTy0OPwLSpi9hkFO91-4DBI1dBM5K0Mo/edit?hl=es&gid=0#gid=0" class="boton-verde">gogle excel</a>
+<a href="https://docs.google.com/presentation/d/1W35PzgO4wj3_8wiO2bDlvgN2g5x6UeohVnPf4EDBWGQ/edit?slide=id.p#slide=id.p" class="boton-rojo">gogle pawerpoint</a>
+<p>todo es seguro y sigue la seguridad de gogle
+1. ¿Para qué pide la cuenta?
+Guardar cambios: Google necesita saber quién escribe para guardar el historial.
+Identidad: Si el archivo es privado, Google verifica si esa persona tiene permiso.
+Herramientas: Al iniciar sesión, el usuario puede usar sus propias plantillas o guardar una copia en su propio Drive.
+2. ¿Es privado?
+Sí, es totalmente privado. Cuando el usuario pone su correo y contraseña, lo hace en la página oficial de Google.</p>
+</div>
+</body>
+</html>

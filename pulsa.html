@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .galeria{
+            display:flex;
+            flex-wrap:wrap;
+            gap: 20px;
+            justify-content:center;
+
+        }
+        .producto{
+            text-align: center;
+            background: white;
+            padding:15px;
+            border-radius:15px;
+            box-shadow:0 4px 8px rgba(0,0,0,0.1);
+            border:1px solid #eee;
+            transition: box-shadow 0.3s;
+        }
+        .producto img{
+            border-radius:8px;
+            object-fit:cover;
+            transition: transform 0.3s ease;
+            cursor:pointer;
+        }
+        .producto img:hover{
+            transform:scale(1.3);
+            box-shadow:0 8px 16px rgba(0,0,0,0.2);
+            position:relative;
+            z-index:10;
+        }
+        nav{
+            text-align:center;
+            margin-bottom:20px;
+            display:flex;
+            flex-wrap:wrap;
+            justify-content:center;
+            gap:10px;
+            position:relative;
+            z-index:100;
+
+        }
+        .boton_azul{
+            background-color:#007bff;
+            color:#fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor:pointer;
+            text-decoration:none;
+            display:inline-block;
+            transition:background 0.3s;
+            flex:1 1 auto;
+            max-width:150px;
+            text-align:center;
+        }
+        .boton_azul:hover{
+            background-color:#0069d9;
+        }
+        .bordes_redondeados{
+            background: white;
+            width:100%;
+            max-width:1200px;
+            padding: 40px;
+            border-radius:20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            border: 1px solid #eee;
+            margin:auto;
+        }
+        body{
+            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            justify-content:center;
+            padding:20px;
+            font-size:16px;
+        }
+        h2{
+            text-align: center;
+            background: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: right; padding: 10px;">
+    <a href="carrito.html" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
+</svg>
+
+            (<span id="cantidad-items">0</span>)
+    </a>
+</div>
+<div class="bordes_redondeados">
+    
+    <div class="contenedor-enlaces"> 
+        <h2>Album de pulsa</h2>
+    <nav>   
+    <a href="index.html" class="boton_azul">inicio:</a>
+    <a href="cadenas.html" class="para_centrar boton_azul">Cadenas:</a>
+    <a href="guillo.html" class="para_centrar boton_azul">guillos:</a>
+    <a href="Anillos.html" class="para_centrar boton_azul">Anillos:</a>
+    <a href="aretes.html"  class="para_centrar boton_azul">Aretes:</a>
+    <a href="juegos.html" class="para_centrar boton_azul">juegos</a>
+    </nav>
+    </div>
+
+    <div class="galeria">
+
+            <div class="producto">  
+            <a href="pulsa1.jpg" target="_blank">
+            <img src="pulsa1.jpg" height="200px" width="150px">
+            </a>
+            <p>precio:<strong Id= "precio-pul-44">$500</strong></p>
+            <p>IQ:44</p>
+            <p>Disponibles: <span id="stock-pul-44">1</span></p>
+            <button onclick="carrito('pul-44', 'pulsa (IQ:44)', 500)">agregar al carrito </button>
+            </div>
+
+            <div class="producto">  
+            <a href="pulsa2.jpg" target="_blank">
+            <img src="pulsa2.jpg" height="200px" width="150px">
+            </a>
+            <p>precio:<strong Id= "precio-pul-45">$500</strong></p>
+            <p>IQ:45</p>
+            <p>Disponibles: <span id="stock-pul-45">1</span></p>
+            <button onclick="carrito('pul-45', 'pulsa (IQ:45)', 500)">agregar al carrito </button>
+            </div>
+            
+            <div class="producto">
+                <a href="pulsa3.jpg" target="_blank">
+                <img src="pulsa3.jpg" height="200px" width="150px">    
+                </a>
+                <p>precio:<strong Id= "precio-pul-46">$500</strong></p>
+                <p>IQ:46</p>
+                <p>Disponibles: <span id="stock-pul-46">1</span></p>
+                <button onclick="carrito('pul-46', 'pulsa (IQ:46)', 500)">agregar al carrito </button>
+            </div>
+        </div>
+    </div>    
+    <script>
+    const URL_BASE_DATOS = "https://script.google.com/macros/s/AKfycbzjVixEyMOKuEPTFq-P9E3T8wsCWUjn2mgMUfgumDNgNiTZhFUU_vvtouCWHfbmb-27/exec";
+    document.addEventListener("DOMContentLoaded", () => {
+        sincronizarStock();
+        actualizarContadorIcono();
+    });
+
+    async function sincronizarStock() {
+        try {
+            const respuesta = await fetch(URL_BASE_DATOS);
+            const productos = await respuesta.json();
+            
+            productos.forEach(p => {
+                // Actualiza el STOCK (esto ya lo tenías)
+                let elStock = document.getElementById('stock-' + p.id);
+                if (elStock) elStock.innerText = p.stock;
+
+                // Actualiza el PRECIO visualmente ($)
+                let elPrecio = document.getElementById('precio-' + p.id);
+                if (elPrecio) elPrecio.innerText = '$' + p.precio;
+
+                //Actualiza el PRECIO dentro del botón para que el carrito cobre bien
+                let elBoton = document.querySelector(`button[onclick*="${p.id}"]`);
+                if (elBoton) {
+                    elBoton.setAttribute("onclick", `carrito('${p.id}', '${p.nombre}', ${p.precio})`);
+                }
+            });
+        } catch (error) {
+            console.error("Error cargando stock y precios:", error);
+        }
+    }
+
+    // MODIFICADO: Ya no envía el POST al Excel aquí
+    function carrito(id, nombre, precio) {
+        let stockElemento = document.getElementById('stock-' + id);
+        if (!stockElemento) return;
+
+        let stockDisponible = parseInt(stockElemento.innerText);
+
+        if (stockDisponible > 0) {
+            // 1. Actualizar pantalla visualmente
+            stockElemento.innerText = stockDisponible - 1;
+
+            // 2. Guardar en Carrito Local (Memoria del navegador)
+            let carritoItems = JSON.parse(localStorage.getItem('mi_carrito')) || [];
+            let itemEnCarrito = carritoItems.find(item => item.id === id);
+            
+            if (itemEnCarrito) {
+                itemEnCarrito.cantidad += 1;
+            } else {
+                carritoItems.push({ id: id, nombre: nombre, precio: Number(precio), cantidad: 1 });
+            }
+            
+            localStorage.setItem('mi_carrito', JSON.stringify(carritoItems));
+            actualizarContadorIcono();
+        } else {
+            alert("¡Este producto se ha agotado!");
+        }
+    }
+
+    function actualizarContadorIcono() {
+        let carritoItems = JSON.parse(localStorage.getItem('mi_carrito')) || [];
+        let total = carritoItems.reduce((acc, p) => acc + (p.cantidad || 0), 0);
+        document.getElementById('cantidad-items').innerText = total;
+    }
+</script>
+</body>
+</html>
