@@ -114,7 +114,7 @@
     <p>precio:<strong Id= "precio-gui-01">$350</strong></p>
     <P>IQ:01</P>
     <p>Disponibles: <span id="stock-gui-01">1</span></p>
-    <button onclick="carrito('gui-01', 'Guillo (IQ:01)', 350)">Agregar</button>
+    <button id="boton-gui-01" onclick="carrito('gui-01', 'Guillo (IQ:01)', 350)">Agregar</button>
     </div>
 
     <div class="producto">
@@ -124,7 +124,7 @@
     <p>precio:<strong Id= "precio-gui-02">$500</strong></p>
     <P>IQ:02</P>
     <p>Disponibles: <span id="stock-gui-02">1</span></p>
-    <button onclick="carrito('gui-02', 'Guillo (IQ:02)', 500)">Agregar</button>
+    <button id="boton-gui-02"onclick="carrito('gui-02', 'Guillo (IQ:02)', 500)">Agregar</button>
     </div>
 
     <div class="producto">
@@ -134,7 +134,7 @@
     <p>precio:<strong Id= "precio-gui-03">$500</strong></p>
     <p>IQ:03</p>
     <p>Disponibles: <span id="stock-gui-03">1</span></p>
-    <button onclick="carrito('gui-03', 'Guillo (IQ:03)', 500)">Agregar</button>
+    <button id="boton-gui-03" onclick="carrito('gui-03', 'Guillo (IQ:03)', 500)">Agregar</button>
     </div>
 
     <div class="producto">
@@ -144,7 +144,7 @@
     <p>precio:<strong Id= "precio-gui-04">$500</strong></p>
     <p>IQ:04</p>
     <p>Disponibles: <span id="stock-gui-04">1</span></p>
-    <button onclick="carrito('gui-04', 'Guillo (IQ:04)', 500)">Agregar</button>
+    <button id="boton-gui-04" onclick="carrito('gui-04', 'Guillo (IQ:04)', 500)">Agregar</button>
         </div>
 
     <div class="producto">
@@ -154,7 +154,7 @@
     <p>precio:<strong Id= "precio-gui-05">$1500</strong></p>
     <p>IQ:05</p>
     <p>Disponibles: <span id="stock-gui-05">1</span></p>
-    <button onclick="carrito('gui-05', 'Guillo (IQ:05)', 1500)">Agregar</button>
+    <button id="boton-gui-05" onclick="carrito('gui-05', 'Guillo (IQ:05)', 1500)">Agregar</button>
         </div>
 
     <div class="producto">
@@ -164,7 +164,7 @@
     <p>precio:<strong Id= "precio-gui-06">$150</strong></p>
     <p>IQ:06</p>
     <p>Disponibles: <span id="stock-gui-06">1</span></p>
-    <button onclick="carrito('gui-06', 'Guillo (IQ:06)', 150)">Agregar</button>
+    <button id="boton-gui-06" onclick="carrito('gui-06', 'Guillo (IQ:06)', 150)">Agregar</button>
         </div>
 
     <div class="producto">
@@ -174,7 +174,7 @@
     <p>precio:<strong Id= "precio-gui-07">$1700</strong></p>
     <p>IQ:07</p>
     <p>Disponibles: <span id="stock-gui-07">1</span></p>
-    <button onclick="carrito('gui-07', 'Guillo (IQ:07)', 1700)">Agregar</button>
+    <button id="boton-gui-07" onclick="carrito('gui-07', 'Guillo (IQ:07)', 1700)">Agregar</button>
         </div>
 
     <div class="producto">
@@ -184,7 +184,7 @@
     <p>precio:<strong Id= "precio-gui-08">$1500</strong></p>
     <p>IQ:08</p>
     <p>Disponibles: <span id="stock-gui-08">1</span></p>
-    <button onclick="carrito('gui-08', 'Guillo (IQ:08)', 1500)">Agregar</button>
+    <button id="boton-gui-08" onclick="carrito('gui-08', 'Guillo (IQ:08)', 1500)">Agregar</button>
         </div>
 
     <div class="producto">
@@ -194,7 +194,7 @@
     <p>precio:<strong Id= "precio-gui-09">$150</strong></p>
     <p>IQ:09</p>
     <p>Disponibles: <span id="stock-gui-09">1</span></p>
-    <button onclick="carrito('gui-09', 'Guillo (IQ:09)', 150)">Agregar</button>
+    <button id="boton-gui-09" onclick="carrito('gui-09', 'Guillo (IQ:09)', 150)">Agregar</button>
         </div>
     </div>
 </div>
@@ -221,10 +221,10 @@
                 if (elPrecio) elPrecio.innerText = '$' + p.precio;
 
                 //Actualiza el PRECIO dentro del botón para que el carrito cobre bien
-                let elBoton = document.querySelector(`button[onclick*="${p.id}"]`);
+                let elBoton = document.getElementById('boton-' + p.id);
                 if (elBoton) {
-                    elBoton.setAttribute("onclick", `carrito('${p.id}', '${p.nombre}', ${p.precio})`);
-                }
+                elBoton.setAttribute("onclick", `carrito('${p.id}', '${p.nombre}', ${p.precio})`);
+            }
             });
         } catch (error) {
             console.error("Error cargando stock y precios:", error);
