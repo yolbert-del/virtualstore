@@ -76,6 +76,11 @@
             justify-content:center;
             padding:20px;
             font-size:16px;
+            transition: background-color 0.4s ease;
+        }
+           /* Solo cambia el fondo a negro, el texto se queda igual */
+        .fondo-negro {
+        background-color: black !important;
         }
         h2{
             text-align: center;
@@ -226,7 +231,29 @@
         let total = carritoItems.reduce((acc, p) => acc + (p.cantidad || 0), 0);
         document.getElementById('cantidad-items').innerText = total;
     }
-    </script>
+
+function toggleFondo() {
+    // Si tiene la clase la quita, si no la tiene la pone
+    document.body.classList.toggle("fondo-negro");
+
+    // Guardamos "si" o "no"
+    const esNegro = document.body.classList.contains("fondo-negro");
+    localStorage.setItem("modoNegro", esNegro ? "si" : "no");
+}
+
+// Al cargar o al cambiar en otra pestaña, ejecutamos esto:
+function sincronizar() {
+    if (localStorage.getItem("modoNegro") === "si") {
+        document.body.classList.add("fondo-negro");
+    } else {
+        document.body.classList.remove("fondo-negro");
+    }
+}
+
+window.addEventListener('DOMContentLoaded', sincronizar);
+window.addEventListener('storage', sincronizar);
+
+</script>
 
 </body>
 </html>

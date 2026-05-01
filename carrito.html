@@ -6,10 +6,36 @@
     <title>Mi Carrito</title>
     <style>
         
-        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; }
-        #carrito-display { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        button { background-color: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        button:hover { background-color: #128c7e; }
+        body { 
+            font-family: sans-serif;
+            padding: 20px; 
+            background-color: #f4f4f4;
+            transition: background-color 0.4s ease;
+        }
+             /* Solo cambia el fondo a negro, el texto se queda igual */
+            .fondo-negro {
+            background-color: black !important;
+        }
+        
+        #carrito-display {
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        button { 
+            background-color: #25d366;
+            color: white;
+            border: none; 
+            padding: 10px 20px;
+            border-radius: 5px; 
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover { 
+        background-color: #128c7e; }
 
         #carrito-display { 
     background: white; 
@@ -41,7 +67,7 @@
         <h2> Tu Carrito</h2>
         <div id="lista-productos" style="display: flex; flex-direction:column; gap: 10px;"></div>
         <p><strong>Total: $<span id="total-precio">0</span></strong></p>
-        <button onclick="enviarPedidoWhatsApp()">Pedir por WhatsApp</button>
+        <button  onclick="if (confirm('Estas seguro de su compra?')) {enviarPedidoWhatsApp();}">Pedir por WhatsApp</button>
         <button onclick="vaciarCarrito()" style="background-color: #ff4b4b; margin-left: 10px;">Vaciar Carrito</button>
     </div>
         
@@ -135,6 +161,29 @@
     }
 
     renderizarCarrito();
+
+function toggleFondo() {
+    // Si tiene la clase la quita, si no la tiene la pone
+    document.body.classList.toggle("fondo-negro");
+
+    // Guardamos "si" o "no"
+    const esNegro = document.body.classList.contains("fondo-negro");
+    localStorage.setItem("modoNegro", esNegro ? "si" : "no");
+}
+
+// Al cargar o al cambiar en otra pestaña, ejecutamos esto:
+function sincronizar() {
+    if (localStorage.getItem("modoNegro") === "si") {
+        document.body.classList.add("fondo-negro");
+    } else {
+        document.body.classList.remove("fondo-negro");
+    }
+}
+
+window.addEventListener('DOMContentLoaded', sincronizar);
+window.addEventListener('storage', sincronizar);
+
+
 </script>
 
 </body>
