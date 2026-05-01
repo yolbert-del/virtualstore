@@ -59,6 +59,23 @@
     align-items: stretch;
 }
 
+    .boton_azul{
+            background-color:#007bff;
+            color:#fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor:pointer;
+            text-decoration:none;
+            display:inline-block;
+            transition:background 0.3s;
+            flex:1 1 auto;
+            max-width:150px;
+            text-align:center;
+        }
+        .boton_azul:hover{
+            background-color:#0069d9;
+        }
+
     </style>
 </head>
 <body>
@@ -69,9 +86,19 @@
         <p><strong>Total: $<span id="total-precio">0</span></strong></p>
         <button  onclick="if (confirm('Estas seguro de su compra?')) {enviarPedidoWhatsApp();}">Pedir por WhatsApp</button>
         <button onclick="vaciarCarrito()" style="background-color: #ff4b4b; margin-left: 10px;">Vaciar Carrito</button>
+        <a href="index.html" class="boton_azul" >inicio:</a>
     </div>
         
 <script>
+
+        // Al cargar la página, revisamos la "memoria"
+window.onload = function() {
+    const temaGuardado = localStorage.getItem("tema");
+    if (temaGuardado === "oscuro") {
+        document.body.classList.add("fondo-negro");
+    }
+};
+
     const URL_BASE_DATOS = "https://script.google.com/macros/s/AKfycbzjVixEyMOKuEPTFq-P9E3T8wsCWUjn2mgMUfgumDNgNiTZhFUU_vvtouCWHfbmb-27/exec";
 
     let productosGuardados = JSON.parse(localStorage.getItem('mi_carrito')) || [];
@@ -162,27 +189,48 @@
 
     renderizarCarrito();
 
+//Esta función cambia el color y GUARDA el estado
 function toggleFondo() {
-    // Si tiene la clase la quita, si no la tiene la pone
-    document.body.classList.toggle("fondo-negro");
+    const cuerpo = document.body;
+    const botonMenu = document.getElementById("btn-menu");
+    
+    // Cambiamos la clase (mejor que cambiar el estilo uno por uno)
+    cuerpo.classList.toggle("fondo-negro");
 
-    // Guardamos "si" o "no"
-    const esNegro = document.body.classList.contains("fondo-negro");
+    // Guardamos la elección
+    const esNegro = cuerpo.classList.contains("fondo-negro");
     localStorage.setItem("modoNegro", esNegro ? "si" : "no");
-}
 
-// Al cargar o al cambiar en otra pestaña, ejecutamos esto:
-function sincronizar() {
-    if (localStorage.getItem("modoNegro") === "si") {
-        document.body.classList.add("fondo-negro");
-    } else {
-        document.body.classList.remove("fondo-negro");
+    // Ajustamos el color del botón ☰ manualmente para asegurar visibilidad
+    if (botonMenu) {
+        botonMenu.style.color = esNegro ? "white" : "black";
     }
 }
 
+//Esta función SINCRONIZA el color al cargar la página o cambiar de pestaña
+function sincronizar() {
+    const cuerpo = document.body;
+    const botonMenu = document.getElementById("btn-menu");
+    const guardado = localStorage.getItem("modoNegro");
+
+    if (guardado === "si") {
+        cuerpo.classList.add("fondo-negro");
+        if (botonMenu) botonMenu.style.color = "white";
+    } else {
+        cuerpo.classList.remove("fondo-negro");
+        if (botonMenu) botonMenu.style.color = "black";
+    }
+}
+
+// Ejecutamos la sincronización automáticamente
 window.addEventListener('DOMContentLoaded', sincronizar);
 window.addEventListener('storage', sincronizar);
 
+// Tu función del menú (está bien, déjala como está)
+function toggleMenu() {
+    var menu = document.getElementById("menu-opciones");
+    menu.style.display = (menu.style.display === "none") ? "block" : "none";
+}
 
 </script>
 

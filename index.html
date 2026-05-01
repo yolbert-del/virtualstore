@@ -116,19 +116,18 @@
             background: white;
             width:100%;
             max-width:1200px;
-            padding: 20px 20px 500px 20px; //40
-            border-radius:20px;
+            padding: 40px;
+            border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
             border: 1px solid #eee;
-            margin:40px auto; //auto
+            margin: auto;
             display: flex;
             justify-content:center;
-            gap:15px;
-            margin-top:20px;
-            flex-wrap:wrap;
-            padding:10px;
-            clear:both;
-            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            padding: 10px;
+            flex-direction: column; 
             align-items: center;
             }
             .alineacion_parrafo{
@@ -198,8 +197,8 @@
     <a href="aretes.html"  class="para_centrar boton_azul">Aretes:</a>
     <a href="pulsa.html" class="para_centrar boton_azul">pulsa</a>
     <a href="juegos.html" class="para_centrar boton_azul">juegos</a>
-    <a href="https://catalogo.somosbelcorp.com/do/DaniaGuzman5/lbel/pages/1?next_campaign=true" class="boton_azulclaro">catalogos de esika</a>
-    <a href="https://do.avonfolletodigital.com/c06_do_2026/cosmeticos-c06-2026-rd/index.html?rep_id=rep6533262309231#page/12-13" class="boton_morado">catalogos de Avon</a>
+    <a href="https://catalogo.somosbelcorp.com/do/DaniaGuzman5?next_campaign=true" class="boton_azulclaro">catalogos de esika</a>
+    <a href="https://do.avonfolletodigital.com/c08_do_2026/?rep_id=rep6533262309231" class="boton_morado">catalogos de Avon</a>
     </div>
     <p>aqui puede ver el total de accesorios disponibles</p>
     <p>accesorios totales<strong>:62</strong></p>
@@ -314,6 +313,15 @@
 </div>   
 
 <script>
+
+    // Al cargar la página, revisamos la "memoria"
+window.onload = function() {
+    const temaGuardado = localStorage.getItem("tema");
+    if (temaGuardado === "oscuro") {
+        document.body.classList.add("fondo-negro");
+    }
+};
+
     const URL_BASE_DATOS = "https://script.google.com/macros/s/AKfycbzjVixEyMOKuEPTFq-P9E3T8wsCWUjn2mgMUfgumDNgNiTZhFUU_vvtouCWHfbmb-27/exec";
     document.addEventListener("DOMContentLoaded", () => {
         sincronizarStock();
@@ -379,36 +387,49 @@
         document.getElementById('cantidad-items').innerText = total;
     }
 
+//Esta función cambia el color y GUARDA el estado
 function toggleFondo() {
-    // Si tiene la clase la quita, si no la tiene la pone
-    document.body.classList.toggle("fondo-negro");
+    const cuerpo = document.body;
+    const botonMenu = document.getElementById("btn-menu");
+    
+    // Cambiamos la clase (mejor que cambiar el estilo uno por uno)
+    cuerpo.classList.toggle("fondo-negro");
 
-    // Guardamos "si" o "no"
-    const esNegro = document.body.classList.contains("fondo-negro");
+    // Guardamos la elección
+    const esNegro = cuerpo.classList.contains("fondo-negro");
     localStorage.setItem("modoNegro", esNegro ? "si" : "no");
-}
 
-// Al cargar o al cambiar en otra pestaña, ejecutamos esto:
-function toggleFondo() {
-    var cuerpo = document.body;
-    var botonLineas = document.getElementById("btn-menu"); // <--- AÑADE ESTA
-
-    if (cuerpo.style.backgroundColor === "black") {
-        cuerpo.style.backgroundColor = "white";
-        botonLineas.style.color = "black"; // <--- AÑADE ESTA (Líneas negras)
-    } else {
-        cuerpo.style.backgroundColor = "black";
-        botonLineas.style.color = "white"; // <--- AÑADE ESTA (Líneas blancas)
+    // Ajustamos el color del botón ☰ manualmente para asegurar visibilidad
+    if (botonMenu) {
+        botonMenu.style.color = esNegro ? "white" : "black";
     }
 }
 
+//Esta función SINCRONIZA el color al cargar la página o cambiar de pestaña
+function sincronizar() {
+    const cuerpo = document.body;
+    const botonMenu = document.getElementById("btn-menu");
+    const guardado = localStorage.getItem("modoNegro");
+
+    if (guardado === "si") {
+        cuerpo.classList.add("fondo-negro");
+        if (botonMenu) botonMenu.style.color = "white";
+    } else {
+        cuerpo.classList.remove("fondo-negro");
+        if (botonMenu) botonMenu.style.color = "black";
+    }
+}
+
+// Ejecutamos la sincronización automáticamente
 window.addEventListener('DOMContentLoaded', sincronizar);
 window.addEventListener('storage', sincronizar);
 
+// Tu función del menú (está bien, déjala como está)
 function toggleMenu() {
     var menu = document.getElementById("menu-opciones");
     menu.style.display = (menu.style.display === "none") ? "block" : "none";
 }
+
 
 </script>
 

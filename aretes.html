@@ -89,13 +89,12 @@
 </head>
 <body>
 
-    <div style="text-align: right; padding: 10px;">
-    <a href="carrito.html" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+<div style="text-align: right; padding: 10px;">
+    <a href="carrito.html" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; position: fixed; top: 15px; right: 20px;">
+    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
 </svg>
-
-            (<span id="cantidad-items">0</span>)
+        (<span id="cantidad-items">0</span>)
     </a>
 </div>
 
@@ -276,6 +275,15 @@
 </div> 
 
 <script>
+
+        // Al cargar la página, revisamos la "memoria"
+window.onload = function() {
+    const temaGuardado = localStorage.getItem("tema");
+    if (temaGuardado === "oscuro") {
+        document.body.classList.add("fondo-negro");
+    }
+};
+
     const URL_BASE_DATOS = "https://script.google.com/macros/s/AKfycbzjVixEyMOKuEPTFq-P9E3T8wsCWUjn2mgMUfgumDNgNiTZhFUU_vvtouCWHfbmb-27/exec";
     document.addEventListener("DOMContentLoaded", () => {
         sincronizarStock();
@@ -341,27 +349,48 @@
         document.getElementById('cantidad-items').innerText = total;
     }
 
+//Esta función cambia el color y GUARDA el estado
 function toggleFondo() {
-    // Si tiene la clase la quita, si no la tiene la pone
-    document.body.classList.toggle("fondo-negro");
+    const cuerpo = document.body;
+    const botonMenu = document.getElementById("btn-menu");
+    
+    // Cambiamos la clase (mejor que cambiar el estilo uno por uno)
+    cuerpo.classList.toggle("fondo-negro");
 
-    // Guardamos "si" o "no"
-    const esNegro = document.body.classList.contains("fondo-negro");
+    // Guardamos la elección
+    const esNegro = cuerpo.classList.contains("fondo-negro");
     localStorage.setItem("modoNegro", esNegro ? "si" : "no");
-}
 
-// Al cargar o al cambiar en otra pestaña, ejecutamos esto:
-function sincronizar() {
-    if (localStorage.getItem("modoNegro") === "si") {
-        document.body.classList.add("fondo-negro");
-    } else {
-        document.body.classList.remove("fondo-negro");
+    // Ajustamos el color del botón ☰ manualmente para asegurar visibilidad
+    if (botonMenu) {
+        botonMenu.style.color = esNegro ? "white" : "black";
     }
 }
 
+//Esta función SINCRONIZA el color al cargar la página o cambiar de pestaña
+function sincronizar() {
+    const cuerpo = document.body;
+    const botonMenu = document.getElementById("btn-menu");
+    const guardado = localStorage.getItem("modoNegro");
+
+    if (guardado === "si") {
+        cuerpo.classList.add("fondo-negro");
+        if (botonMenu) botonMenu.style.color = "white";
+    } else {
+        cuerpo.classList.remove("fondo-negro");
+        if (botonMenu) botonMenu.style.color = "black";
+    }
+}
+
+// Ejecutamos la sincronización automáticamente
 window.addEventListener('DOMContentLoaded', sincronizar);
 window.addEventListener('storage', sincronizar);
 
+// Tu función del menú (está bien, déjala como está)
+function toggleMenu() {
+    var menu = document.getElementById("menu-opciones");
+    menu.style.display = (menu.style.display === "none") ? "block" : "none";
+}
 
 </script>
 
