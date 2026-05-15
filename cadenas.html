@@ -113,61 +113,61 @@
 <div class="galeria">
 
     <div class="producto">
-        <a href="cadena1.jpg" target="_blank">
-    <img src="cadena1.jpg" width="150px" height="200px">
+        <a href="cad-10.jpg" target="_blank">
+    <img src="cad-10.jpg" width="150px" height="200px">
     </a>
     <p>precio:<strong Id= "precio-cad-10">$500</strong></p>
-    <p> IQ:10</p>
+    <p id="ID-cad-10">cadena(IQ:10)</p>
     <p>Disponibles: <span id="stock-cad-10">1</span></p>
     <button id="boton-cad-10" onclick="carrito('cad-10', 'cadena (IQ:10)', 500)">Agregar</button>
     </div>
 
     <div class="producto">
-        <a href="cadena2.jpg" target="_blank">
-    <img src="cadena2.jpg" width="150px" height="200px">
+        <a href="cad-11.jpg" target="_blank">
+    <img src="cad-11.jpg" width="150px" height="200px">
     </a>
     <p>precio:<strong Id= "precio-cad-11">$1500</strong></p>
-    <p> IQ:11</p>
+    <p id="ID-cad-11">cadena(IQ:11)</p>
     <p>Disponibles: <span id="stock-cad-11">1</span></p>
     <button id="boton-cad-11" onclick="carrito('cad-11', 'cadena (IQ:11)', 1500)">Agregar</button>
     </div>
 
     <div class="producto">
-        <a href="cadena3.jpg" target="_blank">
-    <img src="cadena3.jpg"  width="150px" height="200px">
+        <a href="cad-12.jpg" target="_blank">
+    <img src="cad-12.jpg"  width="150px" height="200px">
     </a>
     <p>precio:<strong Id= "precio-cad-12" >$350</strong></p>
-    <p> IQ:12</p>
+    <p id="ID-cad-12">cadena(IQ:12)</p>
     <p>Disponibles: <span id="stock-cad-12">1</span></p>
     <button id="boton-cad-12" onclick="carrito('cad-12', 'cadena (IQ:12)', 350)">Agregar</button>
     </div>
 
     <div class="producto">
-        <a href="cadena4.jpg" target="_blank">
-    <img src="cadena4.jpg" width="150px" height="200px">
+        <a href="cad-13.jpg" target="_blank">
+    <img src="cad-13.jpg" width="150px" height="200px">
     </a>
     <p>precio:<strong Id= "precio-cad-13">$150</strong></p>
-    <P> IQ:13</P> 
+    <p id="ID-cad-13">cadena(IQ:13)</p>
     <p>Disponibles: <span id="stock-cad-13">1</span></p>
     <button id="boton-cad-13" onclick="carrito('cad-13', 'cadena (IQ:13)', 150)">Agregar</button>
     </div>
     
     <div class="producto">
-        <a href="cadena6.jpg" target="_blank">
-    <img src="cadena6.jpg" width="150px" height="200px">
+        <a href="cad-14.jpg" target="_blank">
+    <img src="cad-14.jpg" width="150px" height="200px">
     </a>
     <p>precio:<strong Id= "precio-cad-14">$350</strong></p>
-    <p>IQ:14</p>
+    <p id="ID-cad-14">cadena(IQ:14)</p>
     <p>Disponibles: <span id="stock-cad-14">1</span></p>
     <button id="boton-cad-14" onclick="carrito('cad-14', 'cadena (IQ:14)', 350)">Agregar</button>
         </div>     
 
     <div class="producto">
-        <a href="cadena7.jpg" target="_blank">
-    <img src="cadena7.jpg" width="150px" height="200px">
+        <a href="cad-15.jpg" target="_blank">
+    <img src="cad-15.jpg" width="150px" height="200px">
     </a>
     <p>precio:<strong Id= "precio-cad-15">$1800</strong></p>
-    <p>IQ:15</p>
+    <p id="ID-cad-15">cadena(IQ:15)</p>
     <p>Disponibles: <span id="stock-cad-15">1</span></p>
     <button id="boton-cad-15" onclick="carrito('cad-15', 'cadena (IQ:15)', 1800)">Agregar</button>
         </div>     
@@ -194,6 +194,10 @@
                 //Actualiza el PRECIO visualmente ($)
                 let elPrecio = document.getElementById('precio-' + p.id);
                 if (elPrecio) elPrecio.innerText = '$' + p.precio;
+
+                   // 2. ESTO ACTUALIZA EL IQ (Agrégalo ahora)
+                let elNombre = document.getElementById('ID-' + p.id);
+                if (elNombre) elNombre.innerText = p.nombre;
 
                 //Actualiza el PRECIO dentro del botón para que el carrito cobre bien
                 let elBoton = document.getElementById('boton-' + p.id);

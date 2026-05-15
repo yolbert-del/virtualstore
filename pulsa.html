@@ -114,31 +114,31 @@
     <div class="galeria">
 
             <div class="producto">  
-            <a href="pulsa1.jpg" target="_blank">
-            <img src="pulsa1.jpg" height="200px" width="150px">
+            <a href="pul-44.jpg" target="_blank">
+            <img src="pul-44.jpg" height="200px" width="150px">
             </a>
             <p>precio:<strong Id= "precio-pul-44">$500</strong></p>
-            <p>IQ:44</p>
+            <p id="ID-pul-44">pulsa(IQ:44)</p>
             <p>Disponibles: <span id="stock-pul-44">1</span></p>
             <button id="boton-pul-44" onclick="carrito('pul-44', 'pulsa (IQ:44)', 500)">agregar al carrito </button>
             </div>
 
             <div class="producto">  
-            <a href="pulsa2.jpg" target="_blank">
-            <img src="pulsa2.jpg" height="200px" width="150px">
+            <a href="pul-45.jpg" target="_blank">
+            <img src="pul-45.jpg" height="200px" width="150px">
             </a>
             <p>precio:<strong Id= "precio-pul-45">$500</strong></p>
-            <p>IQ:45</p>
+            <p id="ID-pul-45">pulsa(IQ:45)</p>
             <p>Disponibles: <span id="stock-pul-45">1</span></p>
             <button id="boton-pul-45" onclick="carrito('pul-45', 'pulsa (IQ:45)', 500)">agregar al carrito </button>
             </div>
             
             <div class="producto">
-                <a href="pulsa3.jpg" target="_blank">
-                <img src="pulsa3.jpg" height="200px" width="150px">    
+                <a href="pul-46.jpg" target="_blank">
+                <img src="pul-46.jpg" height="200px" width="150px">    
                 </a>
                 <p>precio:<strong Id= "precio-pul-46">$500</strong></p>
-                <p>IQ:46</p>
+                <p id="ID-pul-46">pulsa(IQ:46)</p>
                 <p>Disponibles: <span id="stock-pul-46">1</span></p>
                 <button id="boton-pul-46" onclick="carrito('pul-46', 'pulsa (IQ:46)', 500)">agregar al carrito </button>
             </div>
@@ -173,6 +173,10 @@ window.onload = function() {
                 //Actualiza el PRECIO visualmente ($)
                 let elPrecio = document.getElementById('precio-' + p.id);
                 if (elPrecio) elPrecio.innerText = '$' + p.precio;
+
+                 // 2. ESTO ACTUALIZA EL IQ (Agrégalo ahora)
+                let elNombre = document.getElementById('ID-' + p.id);
+                if (elNombre) elNombre.innerText = p.nombre;
 
                 //Actualiza el PRECIO dentro del botón para que el carrito cobre bien
                 let elBoton = document.getElementById('boton-' + p.id);

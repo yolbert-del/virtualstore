@@ -115,51 +115,51 @@
     <div class="galeria">
 
             <div class="producto">  
-            <a href="juego1.jpg" target="_blank">
-            <img src="juego1.jpg" height="200px" width="150px">
+            <a href="jue-47.jpg" target="_blank">
+            <img src="jue-47.jpg" height="200px" width="150px">
             </a>
             <p>precio:<strong Id= "precio-jue-47">$500</strong></p>
-            <p>IQ:47</p>
+            <p id="ID-jue-47">juegos(IQ:47)</p>
             <p>Disponibles: <span id="stock-jue-47">1</span></p>
             <button id="boton-jue-47" onclick="carrito('jue-47', 'juegos (IQ:47)', 500)">agregar al carrito </button>
             </div>
 
             <div class="producto">  
-            <a href="juego2.jpg" target="_blank">
-            <img src="juego2.jpg" height="200px" width="150px">
+            <a href="jue-48.jpg" target="_blank">
+            <img src="jue-48.jpg" height="200px" width="150px">
             </a>
             <p>precio:<strong Id= "precio-jue-48">$250</strong></p>
-            <p>IQ:48</p>
+            <p id="ID-jue-48">juegos(IQ:48)</p>
             <p>Disponibles: <span id="stock-jue-48">1</span></p>
             <button id="boton-jue-48" onclick="carrito('jue-48', 'juego (IQ:48)', 250)">agregar al carrito </button>
             </div>
             
             <div class="producto">
-                <a href="juego3.jpg" target="_blank">
-                <img src="juego3.jpg" height="200px" width="150px">    
+                <a href="jue-49.jpg" target="_blank">
+                <img src="jue-49.jpg" height="200px" width="150px">    
                 </a>
                 <p>precio:<strong Id= "precio-jue-49">$250</strong></p>
-                <p>IQ:49</p>
+                <p id="ID-jue-49">juegos(IQ:49)</p>
                 <p>Disponibles: <span id="stock-jue-49">1</span></p>
                 <button id="boton-jue-49" onclick="carrito('jue-49', 'juego (IQ:49)', 250)">agregar al carrito </button>
             </div>
 
                 <div class="producto">
-                <a href="juego4.jpg" target="_blank">
-                <img src="juego4.jpg" height="200px" width="150px">    
+                <a href="jue-50.jpg" target="_blank">
+                <img src="jue-50.jpg" height="200px" width="150px">    
                 </a>
                 <p>precio:<strong Id= "precio-jue-50">$500</strong></p>
-                <p>IQ:50</p>
+                <p id="ID-jue-50">juegos(IQ:50)</p>
                 <p>Disponibles: <span id="stock-jue-50">1</span></p>
                 <button id="boton-jue-50" onclick="carrito('jue-50', 'juego (IQ:50)', 500)">agregar al carrito </button>
             </div>
 
                 <div class="producto">
-                <a href="juego5.jpg" target="_blank">
-                <img src="juego5.jpg" height="200px" width="150px">    
+                <a href="jue-51.jpg" target="_blank">
+                <img src="jue-51.jpg" height="200px" width="150px">    
                 </a>
                 <p>precio:<strong Id= "precio-jue-51">$500</strong></p>
-                <p>IQ:51</p>
+                <p id="ID-jue-51">juegos(IQ:51)</p>
                 <p>Disponibles: <span id="stock-jue-51">1</span></p>
                 <button id="boton-jue-51" onclick="carrito('jue-51', 'juego (IQ:51)', 500)">agregar al carrito </button>
             </div>
@@ -195,6 +195,10 @@ window.onload = function() {
                 //Actualiza el PRECIO visualmente ($)
                 let elPrecio = document.getElementById('precio-' + p.id);
                 if (elPrecio) elPrecio.innerText = '$' + p.precio;
+
+                   // 2. ESTO ACTUALIZA EL IQ (Agrégalo ahora)
+                let elNombre = document.getElementById('ID-' + p.id);
+                if (elNombre) elNombre.innerText = p.nombre;
 
                 //Actualiza el PRECIO dentro del botón para que el carrito cobre bien
                 let elBoton = document.getElementById('boton-' + p.id);
