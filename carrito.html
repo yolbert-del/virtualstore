@@ -3,236 +3,503 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Carrito</title>
+    <title>Carrito – Virtual Store</title>
+    <script src="fallback.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        
-        body { 
-            font-family: sans-serif;
-            padding: 20px; 
-            background-color: #f4f4f4;
-            transition: background-color 0.4s ease;
-        }
-             /* Solo cambia el fondo a negro, el texto se queda igual */
-            .fondo-negro {
-            background-color: black !important;
-        }
-        
-        #carrito-display {
-            background: white; 
-            padding: 20px; 
-            border-radius: 10px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        :root{
+            --azul:#1a56db;
+            --azul-h:#1343b0;
+            --acento:#f59e0b;
+            --fondo:#f0f4ff;
+            --card:#ffffff;
+            --texto:#1e1e2e;
+            --sub:#5a5a7a;
+            --borde:#dde3f5;
+            --sombra:0 8px 32px rgba(26,86,219,.10);
         }
 
-        button { 
-            background-color: #25d366;
-            color: white;
-            border: none; 
-            padding: 10px 20px;
-            border-radius: 5px; 
-            cursor: pointer;
-            font-weight: bold;
+        *,*::before,*::after{
+            box-sizing:border-box;
+            margin:0;padding:0;
         }
 
-        button:hover { 
-        background-color: #128c7e; }
+        body{
+            background-color:var(--fondo);
+            font-family:'DM Sans',sans-serif;
+            color:var(--texto);
+            padding:20px;
+            font-size:16px;
+            transition:background-color .4s ease,color .4s ease;
+            min-height:100vh;
+        }
 
-        #carrito-display { 
-    background: white; 
-    padding: 20px; 
-    border-radius: 10px; 
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-    max-width: 600px; 
-    margin: auto;   
-    text-align: center; 
-}
+        body.fondo-negro{
+            --fondo:#0f0f1a;
+            --card:#1a1a2e;
+            --texto:#e8e8ff;
+            --sub:#9090bb;
+            --borde:#2a2a45;
+            --sombra:0 8px 32px rgba(0,0,0,.4);
+            background-color:var(--fondo)!important;
+        }
 
-#lista-productos div {
-    display: flex !important;
-    width: 100% !important;
-    flex-direction: row; 
-}
+        body::before{
+            content:'';
+            position:fixed;
+            top:-200px;
+            right:-200px;
+            width:600px;
+            height:600px;
+            background:radial-gradient(circle,rgba(26,86,219,.12) 0%,transparent 70%);
+            pointer-events:none;z-index:0;
+        }
 
-#lista-productos {
-    display: flex !important;
-    flex-direction: column !important; 
-    align-items: stretch;
-}
-
-    .boton_azul{
-            background-color:#007bff;
-            color:#fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor:pointer;
-            text-decoration:none;
-            display:inline-block;
-            transition:background 0.3s;
-            flex:1 1 auto;
-            max-width:150px;
+        h1{
+            font-family:'Playfair Display',serif;
+            font-size:clamp(1.8rem,4vw,2.6rem);
+            font-weight:900;
             text-align:center;
-        }
-        .boton_azul:hover{
-            background-color:#0069d9;
+            background:linear-gradient(135deg,#1a56db 0%,#7c3aed 100%);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+            letter-spacing:-1px;
+            margin-bottom:6px;
         }
 
+        p{
+            text-align:center;
+            color:var(--sub);
+            line-height:1.6;
+        }
+
+        .topbar{
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            height:62px;
+            background:rgba(255,255,255,.85);
+            backdrop-filter:blur(14px);
+            border-bottom:1px solid var(--borde);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 20px;
+            z-index:100;
+            transition:background .4s;
+        }
+
+        body.fondo-negro .topbar{
+            background:rgba(15,15,26,.85);
+        }
+
+        #btn-menu{
+            font-size:26px;
+            background:none;
+            border:none;
+            cursor:pointer;
+            color:var(--texto);
+            line-height:1;
+            padding:6px;
+            border-radius:8px;
+            transition:background .2s;
+        }
+
+        #btn-menu:hover
+        {background:var(--borde);
+        }
+
+        #menu-opciones
+        {display:none;
+            position:fixed;
+            top:70px;
+            left:20px;
+            background:var(--card);
+            border:1px solid var(--borde);
+            border-radius:16px;
+            box-shadow:var(--sombra);
+            padding:12px;
+            width:140px;
+            z-index:200;
+            animation:fadeDown .2s ease;
+        }
+
+        @keyframes fadeDown{
+            from{opacity:0;
+            transform:translateY(-8px)}to{opacity:1;
+            transform:translateY(0)}
+            }
+
+        #menu-opciones ul{
+            list-style:none;
+        }
+        #menu-opciones li{margin-bottom:6px;
+        }
+        .menu-item{
+            display:flex;
+            align-items:center;
+            gap:8px;width:100%;
+            padding:8px 10px;
+            border-radius:10px;
+            border:none;
+            background:none;
+            cursor:pointer;
+            font-size:.88rem;
+            color:var(--texto);
+            transition:background .2s;
+            font-family:'DM Sans',sans-serif;
+        }
+
+        .menu-item:hover{
+            background:var(--fondo);
+        }
+
+        .menu-item .icon{
+            font-size:20px;
+        }
+
+        .privacidad-link{
+            display:block;
+            text-align:center;
+            margin-top:8px;
+            padding-top:8px;
+            border-top:1px solid var(--borde);
+            color:var(--azul);
+            text-decoration:none;
+            font-size:.8rem;
+        }
+
+        .topbar-title{
+            font-family:'Playfair Display',serif;
+            font-weight:700;
+            font-size:1.1rem;
+            color:var(--texto);
+        }
+
+        .bordes_redondeados{
+            background:var(--card);
+            width:100%;
+            max-width:680px;
+            padding:48px 40px 40px;
+            border-radius:24px;
+            box-shadow:var(--sombra);
+            border:1px solid var(--borde);
+            margin:80px auto 24px;
+            position:relative;
+            z-index:1;
+        }
+
+        .divider{
+            height:1px;
+            background:linear-gradient(90deg,transparent,var(--borde),transparent);
+            margin:24px 0;
+        }
+
+        #lista-productos{
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+            margin:20px 0;
+        }
+
+        .item-carrito{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            background:var(--fondo);
+            border:1px solid var(--borde);
+            border-radius:14px;
+            padding:14px 16px;
+            gap:12px;
+        }
+
+        .item-info{
+            flex:1;
+            display:flex;
+            flex-direction:column;
+            gap:4px;
+            text-align:left;
+        }
+
+        .item-nombre{
+            font-weight:600;
+            font-size:.95rem;
+            color:var(--texto);
+        }
+
+        .item-detalle{
+            font-size:.83rem;
+            color:var(--sub);
+        }
+
+        .btn-eliminar{
+            background:#ef4444;
+            color:#fff;
+            border:none;
+            padding:7px 14px;
+            border-radius:50px;
+            cursor:pointer;
+            font-size:.8rem;
+            font-weight:600;
+            font-family:'DM Sans',sans-serif;
+            transition:background .2s,transform .15s;
+            white-space:nowrap;
+        }
+
+        .btn-eliminar:hover{
+            background:#dc2626;
+            transform:scale(1.04);
+        }
+
+        .total-box{
+            background:linear-gradient(135deg,rgba(26,86,219,.07),rgba(124,58,237,.07));
+            border:1px solid rgba(26,86,219,.15);
+            border-radius:14px;
+            padding:16px 20px;
+            text-align:center;
+            margin:8px 0;
+        }
+
+        .total-label{
+            font-size:.85rem;
+            color:var(--sub);
+            margin-bottom:4px;
+        }
+
+        .total-monto{
+            font-family:'Playfair Display',serif;
+            font-size:1.8rem;
+            font-weight:900;
+            background:linear-gradient(135deg,#1a56db,#7c3aed);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+        }
+
+        .acciones{
+            display:flex;
+            flex-wrap:wrap;
+            gap:12px;
+            justify-content:center;
+            margin-top:20px;
+        }
+
+        .btn-whatsapp{
+            background:linear-gradient(135deg,#25d366,#128c7e);
+            color:#fff;
+            border:none;
+            padding:12px 28px;
+            border-radius:50px;
+            cursor:pointer;
+            font-size:.95rem;
+            font-weight:700;
+            font-family:'DM Sans',sans-serif;
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            transition:transform .15s,box-shadow .25s;
+            box-shadow:0 4px 14px rgba(37,211,102,.35);
+        }
+
+        .btn-whatsapp:hover{
+            transform:translateY(-2px);
+            box-shadow:0 6px 20px rgba(37,211,102,.45);
+        }
+
+        .btn-vaciar{
+            background:linear-gradient(135deg,#ef4444,#dc2626);
+            color:#fff;border:none;
+            padding:12px 28px;border-radius:50px;
+            cursor:pointer;
+            font-size:.95rem;
+            font-weight:700;
+            font-family:'DM Sans',sans-serif;
+            transition:transform .15s,box-shadow .25s;
+            box-shadow:0 4px 14px rgba(239,68,68,.3);
+        }
+
+        .btn-vaciar:hover{
+            transform:translateY(-2px);
+        }
+        .btn-inicio{
+            background:linear-gradient(135deg,#1a56db,#2563eb);
+            color:#fff;
+            padding:12px 28px;
+            border-radius:50px;
+            text-decoration:none;
+            font-size:.95rem;
+            font-weight:700;
+            font-family:'DM Sans',sans-serif;
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            transition:transform .15s,box-shadow .25s;box-shadow:0 4px 14px rgba(26,86,219,.3);
+        }
+
+        .btn-inicio:hover{
+            transform:translateY(-2px);
+        }
+        .carrito-vacio{
+            text-align:center;
+            padding:40px 20px;
+            color:var(--sub);
+        }
+        .carrito-vacio .emoji{
+            font-size:3rem;
+            display:block;
+            margin-bottom:12px;
+        }
+
+        @media(max-width:600px){
+            .bordes_redondeados{padding:32px 18px 28px;
+            }
+            .acciones{
+                flex-direction:column;
+                align-items:stretch;
+            }
+            .acciones>*{text-align:center;
+                justify-content:center;
+            }
+        }
     </style>
 </head>
 <body>
+<div class="topbar">
+    <nav>
+        <button id="btn-menu" onclick="toggleMenu()">☰</button>
+        <div id="menu-opciones">
+            <ul><li><button class="menu-item" onclick="toggleFondo()"><span class="icon">🌓</span> Tema</button></li></ul>
+            <a href="privacidad.html" class="privacidad-link">Política de Privacidad</a>
+        </div>
+    </nav>
+    <span class="topbar-title">🛒 Mi Carrito</span>
+</div>
 
-    <div id="carrito-display">
-        <h2> Tu Carrito</h2>
-        <div id="lista-productos" style="display: flex; flex-direction:column; gap: 10px;"></div>
-        <p><strong>Total: $<span id="total-precio">0</span></strong></p>
-        <button  onclick="if (confirm('Estas seguro de su compra?')) {enviarPedidoWhatsApp();}">Pedir por WhatsApp</button>
-        <button onclick="vaciarCarrito()" style="background-color: #ff4b4b; margin-left: 10px;">Vaciar Carrito</button>
-        <a href="index.html" class="boton_azul" >inicio:</a>
+<div class="bordes_redondeados">
+    <h1>Tu Carrito</h1>
+    <div class="divider"></div>
+    <div id="lista-productos"></div>
+    <div class="total-box">
+        <p class="total-label">Total a pagar</p>
+        <div class="total-monto">$<span id="total-precio">0</span></div>
     </div>
-        
-<script>
+    <div class="acciones">
+        <button class="btn-whatsapp" onclick="if(confirm('¿Confirmas tu pedido?')){enviarPedidoWhatsApp();}">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.457L0 24zm6.59-4.846c1.66.986 3.288 1.487 4.725 1.488 5.415-.001 9.821-4.35 9.824-9.695.002-2.59-1.001-5.024-2.825-6.85C16.547 2.27 14.12 1.272 11.53 1.272c-5.418 0-9.825 4.351-9.829 9.7-.001 1.516.402 3.013 1.167 4.331l-.995 3.637 3.734-.973z"/></svg>
+            Pedir por WhatsApp
+        </button>
+        <button class="btn-vaciar" onclick="vaciarCarrito()">🗑️ Vaciar Carrito</button>
+        <a href="index.html" class="btn-inicio">← Seguir comprando</a>
+    </div>
+</div>
 
-        // Al cargar la página, revisamos la "memoria"
-window.onload = function() {
-    const temaGuardado = localStorage.getItem("tema");
-    if (temaGuardado === "oscuro") {
-        document.body.classList.add("fondo-negro");
+<script>                  
+    const URL_BASE_DATOS="https://script.google.com/macros/s/AKfycbzXDFi3mSBhq-dFm_QP6MpBrJOifXTsq0t19MsZqoSLzVEmR7l6yw7ZtuJRQ-_JRrhO/exec";
+    let productosGuardados=JSON.parse(localStorage.getItem('mi_carrito'))||[];
+
+    function normalizeId(id) {
+        if (!id) return "";
+        return String(id).trim().toLowerCase().replace(/-0+(\d+)/, '-$1');
     }
-};
 
-    const URL_BASE_DATOS = "https://script.google.com/macros/s/AKfycbzjVixEyMOKuEPTFq-P9E3T8wsCWUjn2mgMUfgumDNgNiTZhFUU_vvtouCWHfbmb-27/exec";
-
-    let productosGuardados = JSON.parse(localStorage.getItem('mi_carrito')) || [];
-
-    function renderizarCarrito() {
-        const lista = document.getElementById('lista-productos');
-        const totalSpan = document.getElementById('total-precio');
-        let total = 0;
-        lista.innerHTML = "";
-
-        if (productosGuardados.length === 0) {
-            lista.innerHTML = "<p style='text-align:center; color:grey;'>Tu carrito está vacío</p>";
-        } else {
-            productosGuardados.forEach((p, index) => {
-                total += (p.precio * p.cantidad);
-                lista.innerHTML += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: #fff; margin-bottom: 10px; padding: 15px; border-radius: 8px; border: 1px solid #ddd; text-align: left; color: black; width:100%; box-sizing: border-box;">
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-                            <strong style="font-size: 1.1rem; color: #333;">${p.nombre}</strong>
-                            <span style="color: #555;">Cantidad: ${p.cantidad} — Precio: $${p.precio}</span>
-                        </div>
-                        <button onclick="eliminarDelCarrito(${index})" style="background-color: red; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; flex-shrink: 0; margin-left:10px;">
-                            Eliminar
-                        </button>
-                    </div>`;
+    function renderizarCarrito(){
+        productosGuardados = JSON.parse(localStorage.getItem('mi_carrito'))||[];
+        const lista=document.getElementById('lista-productos');
+        const totalSpan=document.getElementById('total-precio');
+        let total=0;
+        if (!lista) return;
+        lista.innerHTML="";
+        if(productosGuardados.length===0){
+            lista.innerHTML=`<div class="carrito-vacio"><span class="emoji">🛒</span><p>Tu carrito está vacío</p></div>`;
+        }else{
+            productosGuardados.forEach((p,index)=>{
+                if (p && p.id) {
+                    const priceNum = Number(p.precio || 0);
+                    const qtyNum = Number(p.cantidad || 0);
+                    total+=(priceNum*qtyNum);
+                    lista.innerHTML+=`<div class="item-carrito"><div class="item-info"><span class="item-nombre">${p.nombre || 'Accesorio'}</span><span class="item-detalle">Cantidad: ${qtyNum} &nbsp;·&nbsp; $${priceNum} c/u</span></div><button class="btn-eliminar" onclick="eliminarDelCarrito(${index})">Eliminar</button></div>`;
+                }
             });
         }
-        totalSpan.innerText = total;
+        if (totalSpan) totalSpan.innerText=total;
     }
 
-    function eliminarDelCarrito(index) {
-        if (productosGuardados[index].cantidad > 1) {
-            productosGuardados[index].cantidad -= 1;
-        } else {
-            productosGuardados.splice(index, 1);
+    function eliminarDelCarrito(index){
+        if(productosGuardados[index]){
+            if(productosGuardados[index].cantidad>1){
+                productosGuardados[index].cantidad-=1;
+            }else{
+                productosGuardados.splice(index,1);
+            }
+            localStorage.setItem('mi_carrito',JSON.stringify(productosGuardados));
+            renderizarCarrito();
         }
-        localStorage.setItem('mi_carrito', JSON.stringify(productosGuardados));
-        renderizarCarrito();
     }
 
-    function vaciarCarrito() {
-        if(confirm("¿Estás seguro de que quieres vaciar el carrito?")) {
-            productosGuardados = [];
+    function vaciarCarrito(){
+        if(confirm("¿Estás seguro de que quieres vaciar el carrito?")){
+            productosGuardados=[];
             localStorage.removeItem('mi_carrito');
             renderizarCarrito();
         }
     }
 
-    // ESTA ES LA FUNCIÓN QUE CAMBIA:
-    async function enviarPedidoWhatsApp() {
-        if (productosGuardados.length === 0) return alert("El carrito está vacío");
-
-        //AQUI ENVIA LA ORDEN AL EXCEL PARA DESCONTAR
+    async function enviarPedidoWhatsApp(){
+        if(productosGuardados.length===0)return alert("El carrito está vacío");
+        
         try {
-            // Envia todas las listas de productos al Excel
+            const itemsFormatted = productosGuardados.map(item => `${normalizeId(item.id)}:${item.cantidad}`).join(",");
+            const payloadData = {
+                tipo: "FINALIZAR_PEDIDO",
+                action: "FINALIZAR_PEDIDO",
+                items: itemsFormatted,
+                productos: productosGuardados
+            };
             fetch(URL_BASE_DATOS, {
                 method: "POST",
                 mode: "no-cors",
-                body: JSON.stringify({
-                    tipo: "FINALIZAR_PEDIDO",
-                    items: productosGuardados // Aquí envia el ID y la cantidad de cada uno
-                })
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payloadData)
             });
-        } catch (error) {
-            console.error("Error al descontar stock:", error);
+        } catch(e) {
+            console.error(e);
         }
 
-        //AQUI EL MENSAJE DE WHATSAPP ---
-        const miTelefono = "18092186664";
-        let mensaje = "¡Hola! Quisiera realizar el siguiente pedido:\n\n";
-        
-        productosGuardados.forEach(p => {
-            mensaje += `• ${p.nombre} (x${p.cantidad}) - $${p.precio}\n`;
+        const miTelefono="18092186664";
+        let mensaje="¡Hola! Quisiera realizar el siguiente pedido:\n\n";
+        productosGuardados.forEach(p=>{
+            mensaje+=`• ${p.nombre || 'Accesorio'} (x${p.cantidad}) - $${p.precio}\n`;
         });
+        const total=productosGuardados.reduce((acc,p)=>acc+(Number(p.precio || 0)*Number(p.cantidad || 0)),0);
+        mensaje+=`\n*TOTAL A PAGAR: $${total}*`;
         
-        const total = productosGuardados.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
-        mensaje += `\n*TOTAL A PAGAR: $${total}*`;
-        
-        // Abrir WhatsApp
-        const url = `https://api.whatsapp.com/send?phone=${miTelefono}&text=${encodeURIComponent(mensaje)}`;
-        window.open(url, '_blank');
-
-        //Vaciar el carrito después de pedir para que no se repita
+        window.open(`https://api.whatsapp.com/send?phone=${miTelefono}&text=${encodeURIComponent(mensaje)}`,'_blank');
         localStorage.removeItem('mi_carrito');
-        productosGuardados = [];
+        productosGuardados=[];
         renderizarCarrito();
     }
 
+    function toggleFondo(){
+        document.body.classList.toggle("fondo-negro");
+        localStorage.setItem("modoNegro",document.body.classList.contains("fondo-negro")?"si":"no");
+    }
+
+    function sincronizar(){
+        if(localStorage.getItem("modoNegro")==="si")document.body.classList.add("fondo-negro");
+        else document.body.classList.remove("fondo-negro");
+        renderizarCarrito();
+    }
+
+    function toggleMenu(){
+        var m=document.getElementById("menu-opciones");
+        m.style.display=(m.style.display==="none"||m.style.display==="")?("block"):("none");
+    }
+
+    window.addEventListener('DOMContentLoaded',sincronizar);
+    window.addEventListener('storage',sincronizar);
     renderizarCarrito();
-
-//Esta función cambia el color y GUARDA el estado
-function toggleFondo() {
-    const cuerpo = document.body;
-    const botonMenu = document.getElementById("btn-menu");
-    
-    // Cambiamos la clase (mejor que cambiar el estilo uno por uno)
-    cuerpo.classList.toggle("fondo-negro");
-
-    // Guardamos la elección
-    const esNegro = cuerpo.classList.contains("fondo-negro");
-    localStorage.setItem("modoNegro", esNegro ? "si" : "no");
-
-    // Ajustamos el color del botón ☰ manualmente para asegurar visibilidad
-    if (botonMenu) {
-        botonMenu.style.color = esNegro ? "white" : "black";
-    }
-}
-
-//Esta función SINCRONIZA el color al cargar la página o cambiar de pestaña
-function sincronizar() {
-    const cuerpo = document.body;
-    const botonMenu = document.getElementById("btn-menu");
-    const guardado = localStorage.getItem("modoNegro");
-
-    if (guardado === "si") {
-        cuerpo.classList.add("fondo-negro");
-        if (botonMenu) botonMenu.style.color = "white";
-    } else {
-        cuerpo.classList.remove("fondo-negro");
-        if (botonMenu) botonMenu.style.color = "black";
-    }
-}
-
-// Ejecutamos la sincronización automáticamente
-window.addEventListener('DOMContentLoaded', sincronizar);
-window.addEventListener('storage', sincronizar);
-
-// Tu función del menú (está bien, déjala como está)
-function toggleMenu() {
-    var menu = document.getElementById("menu-opciones");
-    menu.style.display = (menu.style.display === "none") ? "block" : "none";
-}
-
 </script>
-
 </body>
 </html>

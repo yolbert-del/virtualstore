@@ -1,330 +1,651 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document de guillos</title>
-        <style>
-        .galeria{
-            display:flex;
-            flex-wrap:wrap;
-            gap:20px;
-            justify-content:center;
+    <title>Guillos – Virtual Store</title>
+    <script src="fallback.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --azul:#1a56db;
+            --azul-h:#1343b0;
+            --acento:#f59e0b;
+            --fondo:#f0f4ff;
+            --card:#ffffff;
+            --texto:#1e1e2e;
+            --sub:#5a5a7a;
+            --borde:#dde3f5;
+            --sombra:0 8px 32px rgba(26,86,219,.10);
+        }
 
+        *,*::before,*::after{
+            box-sizing:border-box;
+            margin:0;padding:0;
         }
-        .producto{
-            text-align: center;
-            background: white;
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow:0 4px 8px rgba(0,0,0,0.1);
-            border:1px solid #eee;
-            transition:box-shadow 0.3s;
-        }
-        .producto img{
-            border-radius:8px;
-            object-fit:cover;
-            transition: transform 0.3s ease;
-            cursor:pointer;
-        } 
-        .producto img:hover{
-            transform:scale(1.3);
-            box-shadow:0 8px 16px rgba(0,0,0,0.2);
-            position:relative;
-            z-index:10;
-        }
-        nav{
-            text-align:center;
-            margin-bottom:20px;
-            display: flex;
-            flex-wrap:wrap;
-            justify-content:center;
-            gap:10px;
-            position:relative;
-            Z-index:100;
-        }
-        .boton_azul{
-            background-color:#007bff;
-            color:#fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor:pointer;
-            text-decoration:none;
-            display:inline-block;
-            transition:background 0.3s;
-            flex:1 1 auto;
-            max-width:150px;
-            text-align:center;
-        }
-        .boton_azul:hover{
-            background-color:#0069d9;
-        }
-        .bordes_redondeados{
-            background: white;
-            width:100%;
-            max-width:1200px;
-            padding: 40px;
-            border-radius:20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            border: 1px solid #eee;
-            margin:auto;
-        }
+
         body{
-            background-color: #f4f4f4;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            justify-content:center;
+            background-color:var(--fondo);
+            font-family:'DM Sans',sans-serif;
+            color:var(--texto);
             padding:20px;
             font-size:16px;
-            transition: background-color 0.4s ease;
+            transition:background-color .4s,color .4s;
+            min-height:100vh;
         }
-             /* Solo cambia el fondo a negro, el texto se queda igual */
-            .fondo-negro {
-            background-color: black !important;
+
+        body.fondo-negro{
+            --fondo:#0f0f1a;
+            --card:#1a1a2e
+            ;--texto:#e8e8ff;
+            --sub:#9090bb;
+            --borde:#2a2a45;
+            --sombra:0 8px 32px rgba(0,0,0,.4);
+            background-color:var(--fondo)!important;
         }
+
+        body::before{
+            content:'';
+            position:fixed;
+            top:-200px;
+            right:-200px;
+            width:600px;
+            height:600px;
+            background:radial-gradient(circle,rgba(26,86,219,.12) 0%,transparent 70%);
+            pointer-events:none;z-index:0;
+        }
+
+        h1{
+            font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.6rem);
+            font-weight:900;
+            text-align:center;
+            background:linear-gradient(135deg,#1a56db 0%,#7c3aed 100%);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+            letter-spacing:-1px;
+            margin-bottom:6px;
+        }
+
         h2{
-            text-align: center;
-            background: #007bff;
+            text-align:center;
+            color:var(--sub);
+            letter-spacing:4px;
+            text-transform:uppercase;
+            font-size:.78rem;
+            font-weight:600;
+            margin:24px 0 12px;
+        }
+
+        p{
+            text-align:center;
+            color:var(--sub);
+            line-height:1.6;
+        }
+
+        .topbar{
+            position:fixed;
+            top:0;left:0;
+            right:0;
+            height:62px;
+            background:rgba(255,255,255,.85);
+            backdrop-filter:blur(14px);
+            border-bottom:1px solid var(--borde);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 20px;
+            z-index:100;transition:background .4s;
+        }
+
+        body.fondo-negro .topbar{
+            background:rgba(15,15,26,.85);
+        }
+
+        #btn-menu{
+            font-size:26px;
+            background:none;
+            border:none;
+            cursor:pointer;
+            color:var(--texto);
+            line-height:1;
+            padding:6px;
+            border-radius:8px;
+            transition:background .2s;
+        }
+
+        #btn-menu:hover{
+            background:var(--borde);
+        }
+
+        #menu-opciones{
+            display:none;
+            position:fixed;
+            top:70px;
+            left:20px;
+            background:var(--card);
+            border:1px solid var(--borde);
+            border-radius:16px;
+            box-shadow:var(--sombra);
+            padding:12px;width:140px;
+            z-index:200;
+            animation:fadeDown .2s ease;
+        }
+
+        @keyframes fadeDown{
+            from{opacity:0;
+            transform:translateY(-8px)}to{opacity:1;
+            transform:translateY(0)}
+        }
+
+        #menu-opciones ul{
+            list-style:none;
+        }
+        #menu-opciones li{margin-bottom:6px;
+        }
+
+        .menu-item{
+            display:flex;
+            align-items:center;
+            gap:8px;width:100%;
+            padding:8px 10px;
+            border-radius:10px;
+            border:none;
+            background:none;
+            cursor:pointer;
+            font-size:.88rem;
+            color:var(--texto);
+            transition:background .2s;
+            font-family:'DM Sans',sans-serif;
+        }
+
+        .menu-item:hover{
+            background:var(--fondo);
+        }
+        .menu-item .icon{font-size:20px;
+        }
+
+        .privacidad-link{
+            display:block;
+            text-align:center;
+            margin-top:8px;
+            padding-top:8px;
+            border-top:1px solid var(--borde);
+            color:var(--azul);
+            text-decoration:none;
+            font-size:.8rem;
+        }
+
+        .btn-carrito{
+            background:var(--azul);
+            color:#fff;
+            padding:9px 18px;
+            text-decoration:none;
+            border-radius:50px;
+            font-weight:600;
+            font-size:.9rem;
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            transition:background .25s,transform .15s;
+            box-shadow:0 4px 14px rgba(26,86,219,.3);
+        }
+
+        .btn-carrito:hover{
+            background:var(--azul-h);
+            transform:translateY(-1px);
+        }
+
+        .badge{
+            background:var(--acento);
+            color:#1e1e2e;
+            border-radius:50px;
+            padding:1px 8px;
+            font-size:.78rem;
+            font-weight:700;
+        }
+
+        .bordes_redondeados{
+            background:var(--card);
+            width:100%;
+            max-width:1200px;
+            padding:48px 40px 40px;
+            border-radius:24px;
+            box-shadow:var(--sombra);
+            border:1px solid var(--borde);
+            margin:80px auto 24px;
+            position:relative;
+            z-index:1;
+        }
+        .contenedor-enlaces{
+            display:flex;
+            justify-content:center;
+            gap:10px;
+            margin-top:20px;
+            flex-wrap:wrap;
+            padding:10px;
+        }
+        .boton_azul{
+            padding:10px 22px;
+            border-radius:50px;
+            cursor:pointer;
+            text-decoration:none;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            font-size:.88rem;
+            font-weight:600;
+            font-family:'DM Sans',sans-serif;
+            transition:transform .15s,box-shadow .25s,background .25s;
+            white-space:nowrap;
+            background:linear-gradient(135deg,#1a56db,#2563eb);
+            color:#fff;
+            box-shadow:0 3px 12px rgba(26,86,219,.3);
+        }
+        .boton_azul:hover{
+            background:linear-gradient(135deg,#1343b0,#1a56db);
+            transform:translateY(-2px);
+        }
+        .divider{
+            height:1px;
+            background:linear-gradient(90deg,transparent,var(--borde),transparent);
+            margin:24px 0;
+        }
+        .aviso{
+            background:rgba(245,158,11,.1);
+            border:1px solid rgba(245,158,11,.3);
+            border-radius:10px;
+            padding:8px 16px;
+            font-size:.85rem;
+            color:#92600a;
+            text-align:center;
+            margin:12px auto;
+            max-width:500px;
+        }
+
+        body.fondo-negro .aviso{
+            color:#f0b850;
+        }
+
+        .galeria{
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+            gap:20px;
+            justify-items:center;
+            margin-top:24px;
+        }
+        .producto{
+            background:var(--card);
+            border:1px solid var(--borde);
+            border-radius:18px;
+            padding:18px 14px 16px;
+            width:100%;
+            max-width:200px;
+            box-shadow:0 2px 12px rgba(0,0,0,.06);
+            transition:box-shadow .3s,transform .25s,border-color .3s;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:8px;
+        }
+        .producto:hover{
+            box-shadow:0 12px 36px rgba(26,86,219,.13);
+            transform:translateY(-4px);
+            border-color:rgba(26,86,219,.25);
+        }
+        .producto img{
+            border-radius:12px;
+            object-fit:cover;
+            transition:transform .3s;
+            width:150px;
+            height:200px;
+            display:block;
+        }
+        .foto-link{
+            display:block;
+            border-radius:12px;
+            overflow:hidden;
+            transition:transform .3s;
+        }
+        .foto-link:hover{
+            transform:scale(1.05);
+        }
+        .foto-link img{
+            border-radius:12px;
+            width:150px;
+            height:200px;
+            object-fit:cover;
+            display:block;
+        }
+        .ver-det{
+            font-size:.75rem;
+            color:var(--azul);
+            font-weight:600;
+            text-decoration:none;
+            text-align:center;
+        }
+
+        .ver-det:hover{
+            text-decoration:underline;
+        }
+
+        .producto p{
+            font-size:.84rem;
+            color:var(--sub);
+            margin:0;line-height:1.3;
+        }
+
+        .precio-tag{
+            font-size:1.1rem!important;
+            font-weight:700;
+            color:var(--azul)!important;
+        }
+        .nombre-prod{
+            font-size:.83rem;
+            color:var(--texto)!important;
+            font-weight:500;
+            text-align:center;
+        }
+
+        .stock-tag{
+            display:inline-flex;
+            align-items:center;
+            gap:4px;
+            background:rgba(16,185,129,.12);
+            color:#047857;
+            border-radius:50px;
+            padding:2px 10px;
+            font-size:.78rem;
+            font-weight:600;
+        }
+
+        body.fondo-negro .stock-tag{
+            color:#34d399;
+            background:rgba(16,185,129,.15);
+        }
+
+        .likes-tag{
+            display:inline-flex;
+            align-items:center;
+            gap:4px;
+            font-size:.78rem;
+            color:#f43f5e;
+            font-weight:600;
+        }
+        .btn-add{
+            width:100%;
+            padding:9px 12px;
+            background:var(--azul);
+            color:#fff;
+            border:none;
+            border-radius:50px;
+            cursor:pointer;
+            font-size:.82rem;
+            font-weight:600;
+            font-family:'DM Sans',sans-serif;
+            transition:background .25s,transform .15s;
+            box-shadow:0 3px 10px rgba(26,86,219,.25);
+        }
+        .btn-add:hover{
+            background:var(--azul-h);
+            transform:translateY(-1px);
+        }
+        @media(max-width:600px){
+            .bordes_redondeados{
+                padding:32px 18px 28px;
+            }
+            .galeria{
+                grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+                gap:14px;
+            }
+            .foto-link img,.foto-link{
+                width:120px;
+                height:160px;
+            }
         }
     </style>
 </head>
 <body>
-
-<div style="text-align: right; padding: 10px;">
-    <a href="carrito.html" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; position: fixed; top: 15px; right: 20px;">
-    <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
-</svg>
-        (<span id="cantidad-items">0</span>)
+<div class="topbar">
+    <nav>
+        <button id="btn-menu" onclick="toggleMenu()">☰</button>
+        <div id="menu-opciones">
+            <ul><li><button class="menu-item" onclick="toggleFondo()"><span class="icon">🌓</span> Tema</button></li></ul>
+            <a href="privacidad.html" class="privacidad-link">Política de Privacidad</a>
+        </div>
+    </nav>
+    <a href="carrito.html" class="btn-carrito">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/></svg>
+        Carrito <span class="badge" id="cantidad-items">0</span>
     </a>
 </div>
-
-    <div class="bordes_redondeados">
-    <h2>Album de guillos</h2>
-    <nav>
-    <a href="index.html" class="boton_azul">inicio:</a>
-    <a href="cadenas.html" class="boton_azul">Cadenas:</a>
-    <a href="Anillos.html" class="boton_azul">Anillos:</a>
-    <a href="aretes.html" class="boton_azul">Aretes:</a>
-    <a href="pulsa.html" class="para_centrar boton_azul">pulsa</a>
-    <a href="juegos.html" class="para_centrar boton_azul">juegos</a>
-    </nav>
-    <br>
-
-<div class="galeria">
+<div class="bordes_redondeados">
+    <h1> Guillos</h1>
+    <div class="divider"></div>
+    <h2>Categorías</h2>
+    <div class="contenedor-enlaces">
+        <a href="index.html" class="boton_azul">Inicio</a>
+        <a href="cadenas.html" class="boton_azul">Cadenas</a>
+        <a href="Anillos.html" class="boton_azul">Anillos</a>
+        <a href="aretes.html" class="boton_azul">Aretes</a>
+        <a href="pulsa.html" class="boton_azul">Pulsa</a>
+        <a href="juegos.html" class="boton_azul">Juegos</a>
+    </div>
+    <div class="divider"></div>
+    <p class="aviso">⚠️ Toca la foto para ver el detalle </p>
+    <div class="galeria">
+        <!-- Guillos 01 al 09 -->
+        <div class="producto">
+            <a class="foto-link" href="detalle.html?id=gui-01">
+                <img src="gui-01.jpg" alt="Guillo(IQ:01)" onerror="imgError(this, 'Guillo (IQ:01)', 'Guillos')">
+            </a>
+            <p class="precio-tag"><strong id="precio-gui-01">$1500</strong></p>
+            <p class="nombre-prod" id="ID-gui-01">Guillo(IQ:01)</p>
+            <p class="stock-tag">Disp: <span id="stock-gui-01">1</span></p>
+            <p class="likes-tag" id="likes-gui-01">0 ❤️</p>
+            <button class="btn-add" id="boton-gui-01" onclick="carrito('gui-01','Guillo(IQ:01)',1500)">🛒 Agregar al carrito</button>
+            <a class="ver-det" href="detalle.html?id=gui-01">Ver detalle &rarr;</a>
+        </div>
 
         <div class="producto">
-            <a href="gui-1.jpg" target="_blank">
-    <img src="gui-1.jpg" width="150px" height="200px">
-    </a>
-    <p>precio:<strong Id= "precio-gui-01">$350</strong></p>
-    <p id="ID-gui-01">Guillo(IQ:01)</p>
-    <p>Disponibles: <span id="stock-gui-01">1</span></p>
-    <button id="boton-gui-01" onclick="carrito('gui-01', 'Guillo (IQ:01)', 350)">Agregar</button>
-    </div>
-
-    <div class="producto">
-        <a href="gui-2.jpg" target="_blank">
-    <img src="gui-2.jpg" width="150px" height="200px">
-    </a>
-    <p>precio:<strong Id= "precio-gui-02">$500</strong></p>
-    <p id="ID-gui-02">Guillo(IQ:02)</p>
-    <p>Disponibles: <span id="stock-gui-02">1</span></p>
-    <button id="boton-gui-02"onclick="carrito('gui-02', 'Guillo (IQ:02)', 500)">Agregar</button>
-    </div>
-
-    <div class="producto">
-        <a href="gui-3.jpg" target="_blank">
-    <img src="gui-3.jpg" width="150px" height="200px">
-    </a>
-    <p>precio:<strong Id= "precio-gui-03">$500</strong></p>
-    <p id="ID-gui-03">Guillo(IQ:03)</p>
-    <p>Disponibles: <span id="stock-gui-03">1</span></p>
-    <button id="boton-gui-03" onclick="carrito('gui-03', 'Guillo (IQ:03)', 500)">Agregar</button>
-    </div>
-
-    <div class="producto">
-        <a href="gui-4.jpg" target="_blank">
-    <img src="gui-4.jpg" width="150px" height="200px">
-    </a>
-    <p>precio:<strong Id= "precio-gui-04">$500</strong></p>
-    <p id="ID-gui-04">Guillo(IQ:04)</p>
-    <p>Disponibles: <span id="stock-gui-04">1</span></p>
-    <button id="boton-gui-04" onclick="carrito('gui-04', 'Guillo (IQ:04)', 500)">Agregar</button>
-        </div>
-    
-    <div class="producto">
-        <a href="gui-5.jpg" target="_blank">
-    <img src="gui-5.jpg" width="150px" height="200px">
-    </a>
-    <p>precio:<strong Id= "precio-gui-05">$1500</strong></p>
-    <p id="ID-gui-05">Guillo(IQ:05)</p>
-    <p>Disponibles: <span id="stock-gui-05">1</span></p>
-    <button id="boton-gui-05" onclick="carrito('gui-05', 'Guillo (IQ:05)', 1500)">Agregar</button>
+            <a class="foto-link" href="detalle.html?id=gui-02">
+                <img src="gui-02.jpg" alt="Guillo(IQ:02)" onerror="imgError(this, 'Guillo (IQ:02)', 'Guillos')">
+            </a>
+            <p class="precio-tag"><strong id="precio-gui-02">$350</strong></p>
+            <p class="nombre-prod" id="ID-gui-02">Guillo(IQ:02)</p>
+            <p class="stock-tag">Disp: <span id="stock-gui-02">1</span></p>
+            <p class="likes-tag" id="likes-gui-02">0 ❤️</p>
+            <button class="btn-add" id="boton-gui-02" onclick="carrito('gui-02','Guillo(IQ:02)',350)">🛒 Agregar al carrito</button>
+            <a class="ver-det" href="detalle.html?id=gui-02">Ver detalle &rarr;</a>
         </div>
 
-    <div class="producto">
-        <a href="gui-6.jpg" target="_blank">
-    <img src="gui-6.jpg" width="150px" height="200px">
-    </a>
-    <p>precio:<strong Id= "precio-gui-06">$150</strong></p>
-    <p id="ID-gui-06">Guillo(IQ:06)</p>
-    <p>Disponibles: <span id="stock-gui-06">1</span></p>
-    <button id="boton-gui-06" onclick="carrito('gui-06', 'Guillo (IQ:06)', 150)">Agregar</button>
+        <div class="producto">
+            <a class="foto-link" href="detalle.html?id=gui-03">
+                <img src="gui-03.jpg" alt="Guillo(IQ:03)" onerror="imgError(this, 'Guillo (IQ:03)', 'Guillos')">
+            </a>
+            <p class="precio-tag"><strong id="precio-gui-03">$1500</strong></p>
+            <p class="nombre-prod" id="ID-gui-03">Guillo(IQ:03)</p>
+            <p class="stock-tag">Disp: <span id="stock-gui-03">1</span></p>
+            <p class="likes-tag" id="likes-gui-03">0 ❤️</p>
+            <button class="btn-add" id="boton-gui-03" onclick="carrito('gui-03','Guillo(IQ:03)',1500)">🛒 Agregar al carrito</button>
+            <a class="ver-det" href="detalle.html?id=gui-03">Ver detalle &rarr;</a>
         </div>
 
-    <div class="producto">
-        <a href="gui-7.jpg" target="_blank">
-    <img src="gui-7.jpg" width="150px" height="200px">
-    </a>
-    <p>precio:<strong Id= "precio-gui-07">$1700</strong></p>
-    <p id="ID-gui-07">Guillo(IQ:07)</p>
-    <p>Disponibles: <span id="stock-gui-07">1</span></p>
-    <button id="boton-gui-07" onclick="carrito('gui-07', 'Guillo (IQ:07)', 1700)">Agregar</button>
+        <div class="producto">
+            <a class="foto-link" href="detalle.html?id=gui-04">
+                <img src="gui-04.jpg" alt="Guillo(IQ:04)" onerror="imgError(this, 'Guillo (IQ:04)', 'Guillos')">
+            </a>
+            <p class="precio-tag"><strong id="precio-gui-04">$350</strong></p>
+            <p class="nombre-prod" id="ID-gui-04">Guillo(IQ:04)</p>
+            <p class="stock-tag">Disp: <span id="stock-gui-04">1</span></p>
+            <p class="likes-tag" id="likes-gui-04">0 ❤️</p>
+            <button class="btn-add" id="boton-gui-04" onclick="carrito('gui-04','Guillo(IQ:04)',350)">🛒 Agregar al carrito</button>
+            <a class="ver-det" href="detalle.html?id=gui-04">Ver detalle &rarr;</a>
         </div>
 
-    <div class="producto">
-        <a href="gui-8.jpg" target="_blank">
-    <img src="gui-8.jpg" width="150px" height="200px">
-    </a>
-    <p>precio:<strong Id= "precio-gui-08">$1500</strong></p>
-    <p id="ID-gui-08">Guillo(IQ:08)</p>
-    <p>Disponibles: <span id="stock-gui-08">1</span></p>
-    <button id="boton-gui-08" onclick="carrito('gui-08', 'Guillo (IQ:08)', 1500)">Agregar</button>
+        <div class="producto">
+            <a class="foto-link" href="detalle.html?id=gui-05">
+                <img src="gui-05.jpg" alt="Guillo(IQ:05)" onerror="imgError(this, 'Guillo (IQ:05)', 'Guillos')">
+            </a>
+            <p class="precio-tag"><strong id="precio-gui-05">$1500</strong></p>
+            <p class="nombre-prod" id="ID-gui-05">Guillo(IQ:05)</p>
+            <p class="stock-tag">Disp: <span id="stock-gui-05">1</span></p>
+            <p class="likes-tag" id="likes-gui-05">0 ❤️</p>
+            <button class="btn-add" id="boton-gui-05" onclick="carrito('gui-05','Guillo(IQ:05)',1500)">🛒 Agregar al carrito</button>
+            <a class="ver-det" href="detalle.html?id=gui-05">Ver detalle &rarr;</a>
         </div>
 
-    <div class="producto">
-        <a href="gui-9.jpg" target="_blank">
-    <img src="gui-9.jpg" width="150px" height="200px">
-    </a>
-    <p>precio:<strong Id= "precio-gui-09">$150</strong></p>
-    <p id="ID-gui-09">Guillo(IQ:09)</p>
-    <p>Disponibles: <span id="stock-gui-09">1</span></p>
-    <button id="boton-gui-09" onclick="carrito('gui-09', 'Guillo (IQ:09)', 150)">Agregar</button>
+        <div class="producto">
+            <a class="foto-link" href="detalle.html?id=gui-06">
+                <img src="gui-06.jpg" alt="Guillo(IQ:06)" onerror="imgError(this, 'Guillo (IQ:06)', 'Guillos')">
+            </a>
+            <p class="precio-tag"><strong id="precio-gui-06">$700</strong></p>
+            <p class="nombre-prod" id="ID-gui-06">Guillo(IQ:06)</p>
+            <p class="stock-tag">Disp: <span id="stock-gui-06">1</span></p>
+            <p class="likes-tag" id="likes-gui-06">0 ❤️</p>
+            <button class="btn-add" id="boton-gui-06" onclick="carrito('gui-06','Guillo(IQ:06)',700)">🛒 Agregar al carrito</button>
+            <a class="ver-det" href="detalle.html?id=gui-06">Ver detalle &rarr;</a>
+        </div>
+
+        <div class="producto">
+            <a class="foto-link" href="detalle.html?id=gui-07">
+                <img src="gui-07.jpg" alt="Guillo(IQ:07)" onerror="imgError(this, 'Guillo (IQ:07)', 'Guillos')">
+            </a>
+            <p class="precio-tag"><strong id="precio-gui-07">$700</strong></p>
+            <p class="nombre-prod" id="ID-gui-07">Guillo(IQ:07)</p>
+            <p class="stock-tag">Disp: <span id="stock-gui-07">1</span></p>
+            <p class="likes-tag" id="likes-gui-07">0 ❤️</p>
+            <button class="btn-add" id="boton-gui-07" onclick="carrito('gui-07','Guillo(IQ:07)',700)">🛒 Agregar al carrito</button>
+            <a class="ver-det" href="detalle.html?id=gui-07">Ver detalle &rarr;</a>
         </div>
     </div>
 </div>
 
 <script>
+    const URL="https://script.google.com/macros/s/AKfycbzjVixEyMOKuEPTFq-P9E3T8wsCWUjn2mgMUfgumDNgNiTZhFUU_vvtouCWHfbmb-27/exec";
 
-indow.onload = function() {
-    const temaGuardado = localStorage.getItem("tema");
-    if (temaGuardado === "oscuro") {
-        document.body.classList.add("fondo-negro");
-    }
-};
-
-    const URL_BASE_DATOS = "https://script.google.com/macros/s/AKfycbzjVixEyMOKuEPTFq-P9E3T8wsCWUjn2mgMUfgumDNgNiTZhFUU_vvtouCWHfbmb-27/exec";
-    document.addEventListener("DOMContentLoaded", () => {
-        sincronizarStock();
-        actualizarContadorIcono();
-    });
-
-    async function sincronizarStock() {
-        try {
-            const respuesta = await fetch(URL_BASE_DATOS);
-            const productos = await respuesta.json();
-            
-            productos.forEach(p => {
-                // Actualiza el STOCK (esto ya lo tenías)
-                let elStock = document.getElementById('stock-' + p.id);
-                if (elStock) elStock.innerText = p.stock;
-
-                //Actualiza el PRECIO visualmente ($)
-                let elPrecio = document.getElementById('precio-' + p.id);
-                if (elPrecio) elPrecio.innerText = '$' + p.precio;
-
-                   // 2. ESTO ACTUALIZA EL IQ (Agrégalo ahora)
-                let elNombre = document.getElementById('ID-' + p.id);
-                if (elNombre) elNombre.innerText = p.nombre;
-
-                //Actualiza el PRECIO dentro del botón para que el carrito cobre bien
-                let elBoton = document.getElementById('boton-' + p.id);
-                if (elBoton) {
-                elBoton.setAttribute("onclick", `carrito('${p.id}', '${p.nombre}', ${p.precio})`);
-            }
-            });
-        } catch (error) {
-            console.error("Error cargando stock y precios:", error);
-        }
+    // Helpers de Normalización de IDs e Imágenes
+    function normalizeId(id) {
+        if (!id) return "";
+        return String(id).trim().toLowerCase().replace(/-0+(\d+)/, '-$1');
     }
 
-    // MODIFICADO: Ya no envía el POST al Excel aquí
-    function carrito(id, nombre, precio) {
-        let stockElemento = document.getElementById('stock-' + id);
-        if (!stockElemento) return;
-
-        let stockDisponible = parseInt(stockElemento.innerText);
-
-        if (stockDisponible > 0) {
-            // 1. Actualizar pantalla visualmente
-            stockElemento.innerText = stockDisponible - 1;
-
-            // 2. Guardar en Carrito Local (Memoria del navegador)
-            let carritoItems = JSON.parse(localStorage.getItem('mi_carrito')) || [];
-            let itemEnCarrito = carritoItems.find(item => item.id === id);
-            
-            if (itemEnCarrito) {
-                itemEnCarrito.cantidad += 1;
-            } else {
-                carritoItems.push({ id: id, nombre: nombre, precio: Number(precio), cantidad: 1 });
-            }
-            
-            localStorage.setItem('mi_carrito', JSON.stringify(carritoItems));
-            actualizarContadorIcono();
-        } else {
-            alert("¡Este producto se ha agotado!");
-        }
+    function getPaddedId(id) {
+        if (!id) return "";
+        id = String(id).trim().toLowerCase();
+        return id.replace(/-(\d)$/, '-0$1');
     }
 
-    function actualizarContadorIcono() {
-        let carritoItems = JSON.parse(localStorage.getItem('mi_carrito')) || [];
-        let total = carritoItems.reduce((acc, p) => acc + (p.cantidad || 0), 0);
-        document.getElementById('cantidad-items').innerText = total;
-    }
-
-//Esta función cambia el color y GUARDA el estado
-function toggleFondo() {
-    const cuerpo = document.body;
-    const botonMenu = document.getElementById("btn-menu");
+    function imgError(img, name, category) {
+    let tried = img.getAttribute('data-tried') || '';
+    let currentSrc = img.src || '';
     
-    // Cambiamos la clase (mejor que cambiar el estilo uno por uno)
-    cuerpo.classList.toggle("fondo-negro");
-
-    // Guardamos la elección
-    const esNegro = cuerpo.classList.contains("fondo-negro");
-    localStorage.setItem("modoNegro", esNegro ? "si" : "no");
-
-    // Ajustamos el color del botón ☰ manualmente para asegurar visibilidad
-    if (botonMenu) {
-        botonMenu.style.color = esNegro ? "white" : "black";
+    // Intenta automáticamente otras extensiones comunes si falla la primera
+    if (!tried.includes('jpeg') && currentSrc.toLowerCase().endsWith('.jpg')) {
+        img.setAttribute('data-tried', tried + 'jpeg,');
+        img.src = currentSrc.substring(0, currentSrc.length - 4) + '.jpeg';
+        return;
     }
-}
-
-//Esta función SINCRONIZA el color al cargar la página o cambiar de pestaña
-function sincronizar() {
-    const cuerpo = document.body;
-    const botonMenu = document.getElementById("btn-menu");
-    const guardado = localStorage.getItem("modoNegro");
-
-    if (guardado === "si") {
-        cuerpo.classList.add("fondo-negro");
-        if (botonMenu) botonMenu.style.color = "white";
-    } else {
-        cuerpo.classList.remove("fondo-negro");
-        if (botonMenu) botonMenu.style.color = "black";
+    if (!tried.includes('png') && currentSrc.toLowerCase().endsWith('.jpeg')) {
+        img.setAttribute('data-tried', tried + 'png,');
+        img.src = currentSrc.substring(0, currentSrc.length - 5) + '.png';
+        return;
     }
+    if (!tried.includes('webp') && currentSrc.toLowerCase().endsWith('.png')) {
+        img.setAttribute('data-tried', tried + 'webp,');
+        img.src = currentSrc.substring(0, currentSrc.length - 4) + '.webp';
+        return;
+    }
+    if (!tried.includes('jpg') && currentSrc.toLowerCase().endsWith('.webp')) {
+        img.setAttribute('data-tried', tried + 'jpg,');
+        img.src = currentSrc.substring(0, currentSrc.length - 5) + '.jpg';
+        return;
+    }
+
+    // Si de verdad ninguna foto existe, muestra el diseño de repuesto elegante
+    if (img.getAttribute('data-fallback')) return;
+    img.setAttribute('data-fallback', 'true');
+    const initials = name ? name.substring(0, 15) : "Accesorio";
+    const catText = category || "Detalle";
+    img.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="200" viewBox="0 0 150 200"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%231a56db"/><stop offset="100%" stop-color="%237c3aed"/></linearGradient></defs><rect width="100%" height="100%" fill="url(%23g)"/><circle cx="75" cy="85" r="28" fill="none" stroke="white" stroke-width="3" opacity="0.6"/><polygon points="75,65 90,95 60,95" fill="none" stroke="%23f59e0b" stroke-width="3" opacity="0.8"/><text x="50%" y="152" font-family="'DM Sans',sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">${encodeURIComponent(initials)}</text><text x="50%" y="168" font-family="'DM Sans',sans-serif" font-size="8" fill="%23dde3f5" text-anchor="middle" opacity="0.8">${encodeURIComponent(catText)}</text></svg>`;
 }
 
-// Ejecutamos la sincronización automáticamente
-window.addEventListener('DOMContentLoaded', sincronizar);
-window.addEventListener('storage', sincronizar);
+    document.addEventListener("DOMContentLoaded",()=>{syncData();actualizarContadorIcono();});
 
-// Tu función del menú (está bien, déjala como está)
-function toggleMenu() {
-    var menu = document.getElementById("menu-opciones");
-    menu.style.display = (menu.style.display === "none") ? "block" : "none";
-}
+    function getEl(prefix, rawId){
+        let id=String(rawId||"").trim();
+        let el=document.getElementById(prefix+id); if(el) return el;
+        let m=id.match(/^([a-zA-Z]+-)(\d+)$/);
+        if(m){
+            let num=parseInt(m[2]);
+            el=document.getElementById(prefix+m[1]+String(num).padStart(2,"0")); if(el) return el;
+            el=document.getElementById(prefix+m[1]+num);
+        }
+        return el;
+    }
 
+    async function syncData(){
+        try{
+            const r=await fetch(URL);
+            const ps=await r.json();
+            ps.forEach(p=>{
+                const id = String(p.id||"").trim();
+                const likes = parseInt(p.likes)>=0 ? parseInt(p.likes) : 0;
+                
+                // Real-time overlay of local likes
+                const normId = normalizeId(id);
+                const hasLocalLike = localStorage.getItem("like__" + normId) === "si" || localStorage.getItem("like__" + getPaddedId(id)) === "si";
+                const displayedLikes = (hasLocalLike && likes === 0) ? 1 : likes;
+
+                let e=getEl("stock-",p.id); if(e) e.innerText=p.stock;
+                let ep=getEl("precio-",p.id); if(ep) ep.innerText="$"+p.precio;
+                let en=getEl("ID-",p.id); if(en) en.innerText=p.nombre;
+                let eb=getEl("boton-",p.id); if(eb) eb.onclick=()=>carrito(p.id,p.nombre,p.precio);
+                let el=getEl("likes-",p.id); if(el) el.innerText=displayedLikes+" ❤️";
+            });
+        }catch(e){
+            console.error(e);
+        }
+    }
+
+    function carrito(id,nombre,precio){
+        let s=getEl("stock-",id); if(!s)return;
+        let sd=parseInt(s.innerText);
+        if(sd>0){
+            s.innerText=sd-1;
+            let c=JSON.parse(localStorage.getItem("mi_carrito"))||[];
+            let i=c.find(x=>normalizeId(x.id)===normalizeId(id));
+            if(i)i.cantidad+=1;
+            else c.push({id:getPaddedId(id),nombre,precio:Number(precio),cantidad:1});
+            localStorage.setItem("mi_carrito",JSON.stringify(c));
+            actualizarContadorIcono();
+        }else{
+            alert("Agotado!");
+        }
+    }
+
+    function actualizarContadorIcono(){
+        let c=JSON.parse(localStorage.getItem("mi_carrito"))||[];
+        document.getElementById("cantidad-items").innerText=c.reduce((a,p)=>a+(p.cantidad||0),0);
+    }
+
+    function toggleFondo(){
+        document.body.classList.toggle("fondo-negro");
+        localStorage.setItem("modoNegro",document.body.classList.contains("fondo-negro")?"si":"no");
+    }
+
+    function sincronizar(){
+        if(localStorage.getItem("modoNegro")==="si")document.body.classList.add("fondo-negro");
+        else document.body.classList.remove("fondo-negro");
+    }
+
+    function toggleMenu(){
+        var m=document.getElementById("menu-opciones");
+        m.style.display=(m.style.display==="none"||!m.style.display)?"block":"none";
+    }
+
+    window.addEventListener("DOMContentLoaded",sincronizar);
+    window.addEventListener("storage",sincronizar);
 </script>
-
 </body>
 </html>

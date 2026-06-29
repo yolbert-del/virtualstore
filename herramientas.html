@@ -3,354 +3,492 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor a PDF PRO</title>
-    <script src="https://cloudflare.com"></script>
-    <script src="https://cloudflare.com"></script>
-
+    <title>Herramientas – Virtual Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            justify-content: center;
-            flex-direction: column; 
-            align-items: center;    
-            padding-top: 50px;
-            background: #e9ecef;
-            transition: background-color 0.4s ease;
-            }
-         /* Solo cambia el fondo a negro, el texto se queda igual */
-        .fondo-negro {
-            background-color: black !important;
-            }
-        /* DETECTOR DE RATÓN: La tarjeta reacciona al pasar el mouse */
-        .card {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 350px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 2px solid transparent;
-            margin-bottom: 20px;
+        :root{--azul:#1a56db;
+            --azul-h:#1343b0;
+            --acento:#f59e0b;
+            --fondo:#f0f4ff;
+            --card:#ffffff;
+            --texto:#1e1e2e;
+            --sub:#5a5a7a;
+            --borde:#dde3f5;
+            --sombra:0 8px 32px rgba(26,86,219,.10);
         }
-        .card:hover {
-            transform: translateY(-8px); /* Efecto de levitación */
-            box-shadow: 0 15px 30px rgba(0,123,255,0.3); /* Brillo azul */
-            border-color: #007bff;
+
+        *,*::before,*::after{
+            box-sizing:
+            border-box;
+            margin:0;
+            padding:0;
         }
-        h2 { color: #333; font-size: 1.2rem; margin-bottom: 10px; }
-        button {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 10px;
-            width: 100%;
-            font-weight: bold;
-            transition: background 0.2s;
+
+        body{
+            background-color:var(--fondo);
+            font-family:'DM Sans',sans-serif;
+            color:var(--texto);
+            padding:20px;
+            font-size:16px;
+            transition:background-color .4s ease;
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
         }
-        button:hover { background: #0056b3; }
-        textarea {
-            width: 100%;
-            height: 80px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            padding: 5px;
-            box-sizing: border-box;
+
+        body.fondo-negro{
+            --fondo:#0f0f1a;
+            --card:#1a1a2e;
+            --texto:#e8e8ff;
+            --sub:#9090bb;
+            --borde:#2a2a45;
+            --sombra:0 8px 32px rgba(0,0,0,.4);
+            background-color:var(--fondo)!important;
         }
-        /* CUADRO DE PREVISUALIZACIÓN */
-        #vistaHTML {
-            border: 2px dashed #007bff;
-            padding: 10px;
-            margin-top: 15px;
-            max-height: 200px;
-            overflow-y: auto;
-            background: #f8f9fa;
-            text-align: left;
-            font-size: 12px;
-            border-radius: 8px;
+
+        body::before{
+            content:'';
+            position:fixed;
+            top:-200px;
+            right:-200px;
+            width:600px;
+            height:600px;
+            background:radial-gradient(circle,rgba(26,86,219,.12) 0%,transparent 70%);
+            pointer-events:none;
+            z-index:0;
         }
-        hr { margin: 20px 0; border: 0; border-top: 1px solid #eee; }
 
-    .boton-azul{
-    display: block;
-    background: #283da7; 
-    color: white;
-    text-decoration: none;
-    padding: 10px;
-    margin-top: 25px;
-    border-radius: 5px;
-    font-weight: bold;
-}
-.boton-azul:hover{
-    background: #2b2188;
-}
+        /* Topbar */
+        .topbar{
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            height:62px;
+            background:rgba(255,255,255,.85);
+            backdrop-filter:blur(14px);
+            border-bottom:1px solid var(--borde);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 20px;
+            z-index:100;
+            transition:background .4s;
+        }
 
-    .boton-verde{
-    display: block;
-    background: #28a72e; 
-    color: white;
-    text-decoration: none;
-    padding: 10px;
-    margin-top: 25px;
-    border-radius: 5px;
-    font-weight: bold;
-}
-.boton-verde:hover{
-    background: #218837;
-}
+        body.fondo-negro .topbar{
+            background:rgba(15,15,26,.85);
+        }
 
-/* Estado por defecto (Blanco) */
-body {
-    background-color: white;
-    transition: background-color 0.4s ease;
-}
-
-/* Solo cambia el fondo a negro, el texto se queda igual */
-.fondo-negro {
-    background-color: black !important;
-}
-
-    .boton_azul{
-            background-color:#007bff;
-            color:#fff;
-            padding: 20px 20px;
-            border-radius: 5px;
+        #btn-menu{
+            font-size:26px;
+            background:none;
+            border:none;
             cursor:pointer;
-            text-decoration:none;
-            display:inline-block;
-            transition:background 0.3s;
-            flex:1 1 auto;
-            max-width:150px;
+            color:var(--texto);
+            padding:6px;
+            border-radius:8px;
+            transition:background .2s;
+        }
+
+        #btn-menu:hover{
+            background:var(--borde);
+        }
+
+        #menu-opciones{
+            display:none;
+            position:fixed;
+            top:70px;
+            left:20px;
+            background:var(--card);
+            border:1px solid var(--borde);
+            border-radius:16px;
+            box-shadow:var(--sombra);
+            padding:12px;
+            width:140px;
+            z-index:200;
+            animation:fadeDown .2s ease;
+        }
+
+        @keyframes fadeDown{
+            from{
+                opacity:0;
+                transform:translateY(-8px);
+            }
+
+            to{
+                opacity:1;
+                transform:translateY(0);
+            }
+        }
+
+        #menu-opciones ul{
+            list-style:none;
+        }
+
+        #menu-opciones li{
+            margin-bottom:6px;
+        }
+
+        .menu-item{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            width:100%;
+            padding:8px 10px;
+            border-radius:10px;
+            border:none;
+            background:none;
+            cursor:pointer;
+            font-size:.88rem;
+            color:var(--texto);
+            transition:background .2s;
+            font-family:'DM Sans',sans-serif;
+        }
+
+        .menu-item:hover{
+            background:var(--fondo);
+        }
+
+        .topbar-title{
+            font-family:'Playfair Display',serif;
+            font-weight:700;
+            font-size:1.1rem;
+            color:var(--texto);
+        }
+        /* Cards */
+        .page-wrap{
+            width:100%;
+            max-width:480px;
+            margin:90px auto 40px;
+            display:flex;flex-direction:column;
+            gap:24px;
+            position:relative;
+            z-index:1;
+        }
+
+        h1{
+            font-family:'Playfair Display',serif;
+            font-size:clamp(1.5rem,4vw,2rem);
+            font-weight:900;
+            text-align:center;
+            background:linear-gradient(135deg,#1a56db,#7c3aed);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+            margin-bottom:4px;
+        }
+
+        .subtitle{
+            text-align:center;
+            color:var(--sub);
+            font-size:.88rem;
+            margin-bottom:8px;
+        }
+
+        .card{
+            background:var(--card);
+            border:1px solid var(--borde);
+            border-radius:20px;
+            padding:28px 24px;
+            box-shadow:var(--sombra);
+            transition:transform .25s,box-shadow .25s,border-color .3s;
+        }
+        .card:hover{
+            transform:translateY(-5px);
+            box-shadow:0 16px 40px rgba(26,86,219,.13);
+            border-color:rgba(26,86,219,.2);
+        }
+        .card h2{
+            font-size:1.05rem;
+            font-weight:700;
+            color:var(--texto);
+            margin-bottom:14px;
             text-align:center;
         }
-        .boton_azul:hover{
-            background-color:#0069d9;
+        .card p{
+            font-size:.85rem;
+            color:var(--sub);
+            line-height:1.65;
+            text-align:left;
+            margin-top:10px;
+        }
+        input[type="file"],textarea{
+            width:100%;
+            margin-top:10px;
+            border-radius:10px;
+            border:1px solid var(--borde);
+            padding:8px 10px;
+            font-family:'DM Sans',sans-serif;
+            font-size:.88rem;
+            background:var(--fondo);
+            color:var(--texto);
+            box-sizing:border-box;
+            transition:border-color .2s;
+        }
+        input[type="file"]:focus,textarea:focus{
+            outline:none;
+            border-color:var(--azul);
+        }
+        textarea{
+            height:80px;
+            resize:vertical;
         }
 
+        .visor{
+            font-size:.8rem;
+            color:#22c55e;
+            margin-top:4px;
+            min-height:18px;
+        }
+
+        hr{
+            border:none;
+            border-top:1px solid var(--borde);
+            margin:18px 0;
+        }
+
+        .btn{
+            width:100%;
+            margin-top:10px;
+            padding:11px;
+            border:none;
+            border-radius:50px;
+            cursor:pointer;
+            font-size:.88rem;
+            font-weight:700;
+            font-family:'DM Sans',sans-serif;
+            transition:transform .15s,box-shadow .2s;
+        }
+
+        .btn-azul{
+            background:linear-gradient(135deg,#1a56db,#2563eb);
+            color:#fff;
+            box-shadow:0 3px 12px rgba(26,86,219,.3);
+        }
+
+        .btn-azul:hover{
+            transform:translateY(-1px);
+            box-shadow:0 5px 16px rgba(26,86,219,.4);
+        }
+
+        .btn-rojo{
+            background:linear-gradient(135deg,#ef4444,#dc2626);
+            color:#fff;
+            box-shadow:0 3px 10px rgba(239,68,68,.3);
+        }
+
+        .btn-rojo:hover{
+            transform:translateY(-1px);
+        }
+
+        .btn-verde{
+            background:linear-gradient(135deg,#22c55e,#16a34a);
+            color:#fff;
+            box-shadow:0 3px 10px rgba(34,197,94,.3);
+        }
+
+        .btn-verde:hover{
+            transform:translateY(-1px);
+        }
+
+        #vistaHTML{
+            border:2px dashed var(--borde);
+            padding:10px;
+            margin-top:12px;
+            max-height:180px;
+            overflow-y:auto;
+            background:var(--fondo);
+            text-align:left;
+            font-size:.8rem;
+            border-radius:10px;
+            color:var(--sub);
+        }
+
+        .btn-inicio{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            margin-top:4px;
+            padding:11px 26px;
+            background:linear-gradient(135deg,#1a56db,#2563eb);
+            color:#fff;border-radius:50px;text-decoration:none;
+            font-weight:600;
+            font-size:.88rem;
+            transition:transform .15s;box-shadow:0 4px 14px rgba(26,86,219,.3);
+            justify-content:center;
+        }
+
+        .btn-inicio:hover{
+            transform:translateY(-2px);
+        }
+
+        /* Card info Google */
+        .info-card{
+            background:var(--card);
+            border:1px solid var(--borde);
+            border-radius:20px;
+            padding:24px;
+            box-shadow:var(--sombra);
+        }
+
+        .info-card h2{
+            font-size:1rem;
+            font-weight:700;
+            color:var(--texto);
+            margin-bottom:14px;
+            text-align:center;
+        }
+        .link-externo{
+            display:block;
+            width:100%;
+            padding:11px;
+            border-radius:50px;
+            text-align:center;
+            text-decoration:none;
+            font-weight:700;
+            font-size:.88rem;
+            font-family:'DM Sans',sans-serif;
+            margin-top:10px;
+            transition:transform .15s,box-shadow .2s;
+        }
+        .link-azul{
+            background:linear-gradient(135deg,#1a56db,#2563eb);
+            color:#fff;
+            box-shadow:0 3px 12px rgba(26,86,219,.3);
+        }
+        .link-azul:hover{transform:translateY(-1px);}
+        .link-verde{
+            background:linear-gradient(135deg,#22c55e,#16a34a);
+            color:#fff;
+            box-shadow:0 3px 10px rgba(34,197,94,.3);
+        }
+        .link-verde:hover{
+            transform:translateY(-1px);
+        }
+        @media(max-width:480px){.page-wrap{margin-top:80px;}
+    }
     </style>
 </head>
-<body> 
-<div class="card">
-    <h2>📄 Texto a PDF</h2>
-    <input type="file" id="archivoTexto" accept=".txt" multiple>
-    <div id="vTexto" class="visor"></div>
-    <textarea id="texto" placeholder="O escribe aquí..."></textarea>
-    <button onclick="limpiarTodo()" style="background: #dc3545; margin-top: 20px;">🗑️ Limpiar Todo</button>
-    <button id="btnTexto" onclick="convertirTexto()">Descargar Texto</button>
-
-    <hr>
-
-    <h2>🖼️ Imágenes a PDF</h2>
-    <input type="file" id="archivoImagen" accept="image/*" multiple>
-    <div id="vImagen" class="visor"></div>
-    <button onclick="limpiarTodo()" style="background: #dc3545; margin-top: 20px;">🗑️ Limpiar Todo</button>
-    <button id="btnImagen" onclick="convertirImagenes()">Descargar Imágenes</button>
-
-    <hr>
-
-    <h2>🌐 HTML a PDF</h2>
-    <input type="file" id="archivoHTML" accept=".html, image/*" multiple>
-    <div id="vHTML" class="visor"></div>
-    <div id="vistaHTML">La previa aparecerá aquí...</div>
-    <button onclick="limpiarTodo()" style="background: #dc3545; margin-top: 20px;">🗑️ Limpiar Todo</button>
-    <button id="btnHTML" onclick="convertirHTML()">Descargar HTML</button>
-    <a href="index.html" class="boton_azul" style="margin-top: 20px;">inicio:</a>
+<body>
+<div class="topbar">
+    <nav>
+        <button id="btn-menu" onclick="toggleMenu()">☰</button>
+        <div id="menu-opciones">
+            <ul><li><button class="menu-item" onclick="toggleFondo()"><span>🌓</span> Tema</button></li></ul>
+        </div>
+    </nav>
+    <span class="topbar-title">🛠️ Herramientas</span>
 </div>
 
+<div class="page-wrap">
+    <h1>Herramientas PDF</h1>
+    <p class="subtitle">Convierte textos, imágenes y HTML a PDF fácilmente</p>
 
-<!-- LIBRERÍAS (CUIDADO: Siempre usa las URLs completas de cdnjs) -->
+    <!-- Texto a PDF -->
+    <div class="card">
+        <h2>📄 Texto a PDF</h2>
+        <input type="file" id="archivoTexto" accept=".txt" multiple>
+        <div id="vTexto" class="visor"></div>
+        <textarea id="texto" placeholder="O escribe aquí tu texto..."></textarea>
+        <button class="btn btn-rojo" onclick="limpiarTodo()">🗑️ Limpiar</button>
+        <button class="btn btn-azul" id="btnTexto" onclick="convertirTexto()">⬇️ Descargar como PDF</button>
+    </div>
+
+    <!-- Imágenes a PDF -->
+    <div class="card">
+        <h2>🖼️ Imágenes a PDF</h2>
+        <input type="file" id="archivoImagen" accept="image/*" multiple>
+        <div id="vImagen" class="visor"></div>
+        <button class="btn btn-rojo" onclick="limpiarTodo()">🗑️ Limpiar</button>
+        <button class="btn btn-azul" id="btnImagen" onclick="convertirImagenes()">⬇️ Descargar como PDF</button>
+    </div>
+
+    <!-- HTML a PDF -->
+    <div class="card">
+        <h2>🌐 HTML a PDF</h2>
+        <input type="file" id="archivoHTML" accept=".html,image/*" multiple>
+        <div id="vHTML" class="visor"></div>
+        <div id="vistaHTML">La previa aparecerá aquí...</div>
+        <button class="btn btn-rojo" onclick="limpiarTodo()">🗑️ Limpiar</button>
+        <button class="btn btn-azul" id="btnHTML" onclick="convertirHTML()">⬇️ Descargar como PDF</button>
+    </div>
+
+    <!-- Google Drive -->
+    <div class="info-card">
+        <h2>☁️ Herramientas para proyectos de clase</h2>
+        <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.docs&hl=es" class="link-externo link-azul" target="_blank" rel="noopener">Descargar Google Drive</a>
+        <a href="https://docs.google.com/" class="link-externo link-verde" target="_blank" rel="noopener">Usar herramientas de Google</a>
+        <p>Todo es seguro y usa la infraestructura de Google. Al iniciar sesión, Google verifica tu identidad para guardar cambios y mantener tus archivos privados.</p>
+    </div>
+
+    <a href="index.html" class="btn-inicio">← Volver al inicio</a>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cloudflare.com"></script>
-
 <script>
+    const leer=(f,t)=>new Promise(r=>{const rd=new FileReader();rd.onload=e=>r(e.target.result);t==='txt'?rd.readAsText(f):rd.readAsDataURL(f);});
+    const cargarImg=(src)=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src;});
 
-        // Al cargar la página, revisamos la "memoria"
-window.onload = function() {
-    const temaGuardado = localStorage.getItem("tema");
-    if (temaGuardado === "oscuro") {
-        document.body.classList.add("fondo-negro");
+    const setupVisor=(id,v)=>document.getElementById(id).addEventListener("change",e=>{
+        document.getElementById(v).innerText=e.target.files.length>0?`✅ ${e.target.files.length} archivo(s)`:""
+    });
+    setupVisor("archivoTexto","vTexto");
+    setupVisor("archivoImagen","vImagen");
+    setupVisor("archivoHTML","vHTML");
+
+    async function convertirTexto(){
+        const files=document.getElementById("archivoTexto").files;
+        const txt=document.getElementById("texto").value;
+        const btn=document.getElementById("btnTexto");
+        const{jsPDF}=window.jspdf;const doc=new jsPDF();
+        btn.disabled=true;btn.innerText="⏳ Generando...";
+        try{
+            if(files.length>0){for(let i=0;i<files.length;i++){if(i>0)doc.addPage();const c=await leer(files[i],'txt');doc.text(doc.splitTextToSize(c,180),10,10);}doc.save("textos.pdf");}
+            else if(txt){doc.text(doc.splitTextToSize(txt,180),10,10);doc.save("nota.pdf");}
+            else{alert("Sube un archivo o escribe algo.");}
+        }finally{btn.disabled=false;btn.innerText="⬇️ Descargar como PDF";}
     }
-};
 
-// --- UTILIDADES ---
-const leer = (f, t) => new Promise(r => { const reader = new FileReader(); reader.onload = e => r(e.target.result); t === 'txt' ? reader.readAsText(f) : reader.readAsDataURL(f); });
-const cargarImg = (src) => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = src; });
-
-// --- VISORES DE CONTEO ---
-const setupVisor = (id, v) => document.getElementById(id).addEventListener("change", e => {
-    document.getElementById(v).innerText = e.target.files.length > 0 ? `✅ ${e.target.files.length} archivos` : "";
-});
-setupVisor("archivoTexto", "vTexto");
-setupVisor("archivoImagen", "vImagen");
-setupVisor("archivoHTML", "vHTML");
-
-// --- LÓGICA DE TEXTO ---
-async function convertirTexto() {
-    const files = document.getElementById("archivoTexto").files;
-    const txt = document.getElementById("texto").value;
-    const btn = document.getElementById("btnTexto");
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    btn.disabled = true; btn.innerText = "⏳...";
-    try {
-        if (files.length > 0) {
-            for (let i = 0; i < files.length; i++) {
-                if (i > 0) doc.addPage();
-                const c = await leer(files[i], 'txt');
-                doc.text(doc.splitTextToSize(c, 180), 10, 10);
-            }
-            doc.save("textos.pdf");
-        } else if (txt) {
-            doc.text(doc.splitTextToSize(txt, 180), 10, 10);
-            doc.save("nota.pdf");
-        }
-    } finally { btn.disabled = false; btn.innerText = "Descargar Texto"; }
-}
-
-// --- LÓGICA DE IMÁGENES ---
-async function convertirImagenes() {
-    const files = document.getElementById("archivoImagen").files;
-    const btn = document.getElementById("btnImagen");
-    if (!files.length) return alert("Sube imágenes");
-    
-    btn.disabled = true; btn.innerText = "⏳...";
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    try {
-        for (let i = 0; i < files.length; i++) {
-            if (i > 0) doc.addPage();
-            const data = await leer(files[i], 'img');
-            const img = await cargarImg(data);
-            doc.addImage(img, 'JPEG', 10, 10, 190, (img.height * 190) / img.width, undefined, 'FAST');
-        }
-        doc.save("imagenes.pdf");
-    } finally { btn.disabled = false; btn.innerText = "Descargar Imágenes"; }
-}
-
-// --- LÓGICA DE HTML (Previa + Vinculación de imágenes) ---
-document.getElementById("archivoHTML").addEventListener("change", async function(e) {
-    const files = Array.from(e.target.files);
-    const htmlFile = files.find(f => f.name.endsWith('.html'));
-    if (htmlFile) {
-        let content = await leer(htmlFile, 'txt');
-        const box = document.getElementById("vistaHTML");
-        box.innerHTML = content;
-        // Vincular imágenes locales si el usuario las subió juntas
-        const imgs = box.querySelectorAll("img");
-        for (let img of imgs) {
-            const f = files.find(file => file.name === img.getAttribute("src"));
-            if (f) img.src = await leer(f, 'img');
-        }
+    async function convertirImagenes(){
+        const files=document.getElementById("archivoImagen").files;
+        const btn=document.getElementById("btnImagen");
+        if(!files.length)return alert("Sube al menos una imagen");
+        btn.disabled=true;btn.innerText="⏳ Generando...";
+        const{jsPDF}=window.jspdf;const doc=new jsPDF();
+        try{
+            for(let i=0;i<files.length;i++){if(i>0)doc.addPage();const data=await leer(files[i],'img');const img=await cargarImg(data);doc.addImage(img,'JPEG',10,10,190,(img.height*190)/img.width,undefined,'FAST');}
+            doc.save("imagenes.pdf");
+        }finally{btn.disabled=false;btn.innerText="⬇️ Descargar como PDF";}
     }
-});
 
-function convertirHTML() {
-    const contenido = document.getElementById("vistaHTML").innerHTML;
-    if(contenido.includes("previa aparecerá")) return alert("Sube un HTML primero");
+    document.getElementById("archivoHTML").addEventListener("change",async function(e){
+        const files=Array.from(e.target.files);const htmlFile=files.find(f=>f.name.endsWith('.html'));
+        if(htmlFile){let content=await leer(htmlFile,'txt');const box=document.getElementById("vistaHTML");box.innerHTML=content;const imgs=box.querySelectorAll("img");for(let img of imgs){const f=files.find(file=>file.name===img.getAttribute("src"));if(f)img.src=await leer(f,'img');}}
+    });
 
-    const ventana = window.open('', '', 'height=700,width=900');
-    
-    // Construlle las etiquetas por piezas para que el navegador no las reconozca
-    const h = 'ht' + 'ml';
-    const b = 'bo' + 'dy';
-    
-    ventana.document.write('<' + h + '><head><title>PDF</title>');
-    ventana.document.write('<style>body{font-family:sans-serif;padding:20px;}img{max-width:100%;}</style>');
-    ventana.document.write('</head><' + b + '>');
-    ventana.document.write(contenido);
-    ventana.document.write('</' + b + '></' + h + '>');
-    
-    ventana.document.close();
-    
-    setTimeout(() => {
-        ventana.print();
-        ventana.close();
-    }, 500);
-}
-// --- FUNCIÓN PARA BORRAR TODO ---
-function limpiarTodo() {
-    // Limpia todos los selectores de archivos (inputs)
-    document.getElementById("archivoTexto").value = "";
-    document.getElementById("archivoImagen").value = "";
-    document.getElementById("archivoHTML").value = "";
-
-    // Limpia el área de texto manual
-    document.getElementById("texto").value = "";
-
-    //Resetea los visores de conteo (los que dicen ✅ X archivos)
-    document.getElementById("vTexto").innerText = "";
-    document.getElementById("vImagen").innerText = "";
-    document.getElementById("vHTML").innerText = "";
-
-    // Restaura el mensaje inicial de la previsualización HTML
-    document.getElementById("vistaHTML").innerHTML = "La previa aparecerá aquí...";
-
-    // Pequeño aviso visual de que se borró todo
-    console.log("Formulario reseteado correctamente.");
-}
-
-//Esta función cambia el color y GUARDA el estado
-function toggleFondo() {
-    const cuerpo = document.body;
-    const botonMenu = document.getElementById("btn-menu");
-    
-    // Cambiamos la clase (mejor que cambiar el estilo uno por uno)
-    cuerpo.classList.toggle("fondo-negro");
-
-    // Guardamos la elección
-    const esNegro = cuerpo.classList.contains("fondo-negro");
-    localStorage.setItem("modoNegro", esNegro ? "si" : "no");
-
-    // Ajustamos el color del botón ☰ manualmente para asegurar visibilidad
-    if (botonMenu) {
-        botonMenu.style.color = esNegro ? "white" : "black";
+    function convertirHTML(){
+        const contenido=document.getElementById("vistaHTML").innerHTML;
+        if(contenido.includes("previa aparecerá"))return alert("Sube un HTML primero");
+        const ventana=window.open('','','height=700,width=900');
+        const h='ht'+'ml';const b='bo'+'dy';
+        ventana.document.write('<'+h+'><head><title>PDF</title><style>body{font-family:sans-serif;padding:20px;}img{max-width:100%;}</style></head><'+b+'>');
+        ventana.document.write(contenido);ventana.document.write('</'+b+'></'+h+'>');
+        ventana.document.close();setTimeout(()=>{ventana.print();ventana.close();},500);
     }
-}
 
-//Esta función SINCRONIZA el color al cargar la página o cambiar de pestaña
-function sincronizar() {
-    const cuerpo = document.body;
-    const botonMenu = document.getElementById("btn-menu");
-    const guardado = localStorage.getItem("modoNegro");
-
-    if (guardado === "si") {
-        cuerpo.classList.add("fondo-negro");
-        if (botonMenu) botonMenu.style.color = "white";
-    } else {
-        cuerpo.classList.remove("fondo-negro");
-        if (botonMenu) botonMenu.style.color = "black";
+    function limpiarTodo(){
+        document.getElementById("archivoTexto").value="";document.getElementById("archivoImagen").value="";document.getElementById("archivoHTML").value="";
+        document.getElementById("texto").value="";document.getElementById("vTexto").innerText="";document.getElementById("vImagen").innerText="";document.getElementById("vHTML").innerText="";
+        document.getElementById("vistaHTML").innerHTML="La previa aparecerá aquí...";
     }
-}
 
-// Ejecutamos la sincronización automáticamente
-window.addEventListener('DOMContentLoaded', sincronizar);
-window.addEventListener('storage', sincronizar);
-
-// Tu función del menú (está bien, déjala como está)
-function toggleMenu() {
-    var menu = document.getElementById("menu-opciones");
-    menu.style.display = (menu.style.display === "none") ? "block" : "none";
-}
-
+    function toggleFondo(){document.body.classList.toggle("fondo-negro");localStorage.setItem("modoNegro",document.body.classList.contains("fondo-negro")?"si":"no");}
+    function sincronizar(){if(localStorage.getItem("modoNegro")==="si")document.body.classList.add("fondo-negro");else document.body.classList.remove("fondo-negro");}
+    function toggleMenu(){var m=document.getElementById("menu-opciones");m.style.display=(m.style.display==="none"||m.style.display==="")?("block"):("none");}
+    window.addEventListener('DOMContentLoaded',sincronizar);
+    window.addEventListener('storage',sincronizar);
 </script>
-<div class="card">
-    <h2>Herramientas importantes para proyectos de clase </h2>
-<a href="https://play.google.com/store/apps/details?id=com.google.android.apps.docs&hl=es" class="boton-azul">Descarga Gogle Drive</a>
-<a href="https://docs.google.com/" class="boton-verde">Usar sus herramientas</a>
-<p>todo es seguro y sigue la seguridad de gogle
-1. ¿Para qué pide la cuenta?
-Guardar cambios: Google necesita saber quién escribe para guardar el historial.
-Identidad: Si el archivo es privado, Google verifica si esa persona tiene permiso.
-Herramientas: Al iniciar sesión, el usuario puede usar sus propias plantillas o guardar una copia en su propio Drive.
-2. ¿Es privado?
-Sí, es totalmente privado. Cuando el usuario pone su correo y contraseña, lo hace en la página oficial de Google.</p>
-</div>
 </body>
 </html>
