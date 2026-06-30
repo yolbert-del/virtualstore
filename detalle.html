@@ -440,6 +440,62 @@
         }
 
         @media(max-width:600px){.card-detalle{padding:20px 14px;gap:18px;}.foto-principal{width:100%;height:auto;max-height:300px;}.col-img{width:100%;}}
+
+        /* Modal lightbox */
+        .modal-zoom {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 26, 0.95);
+            backdrop-filter: blur(12px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: zoom-out;
+        }
+        .modal-zoom.show {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-zoom.show .modal-img-content {
+            transform: scale(1);
+        }
+        .modal-img-content {
+            max-width: 90%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            transform: scale(0.92);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background .2s, transform .2s;
+        }
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -491,7 +547,7 @@
 </div>
 
 <script>
-const URL_API = "https://script.google.com/macros/s/AKfycbzXDFi3mSBhq-dFm_QP6MpBrJOifXTsq0t19MsZqoSLzVEmR7l6yw7ZtuJRQ-_JRrhO/exec";
+const URL_API = "https://script.google.com/macros/s/AKfycbzjVixEyMOKuEPTFq-P9E3T8wsCWUjn2mgMUfgumDNgNiTZhFUU_vvtouCWHfbmb-27/exec";
 const params  = new URLSearchParams(window.location.search);
 const ID_ACT  = (params.get("id") || "").trim().toLowerCase();
 
@@ -524,7 +580,6 @@ function imgError(img, name, category) {
     let tried = img.getAttribute('data-tried') || '';
     let currentSrc = img.src || '';
     
-    // Intenta automáticamente otras extensiones comunes si falla la primera
     if (!tried.includes('jpeg') && currentSrc.toLowerCase().endsWith('.jpg')) {
         img.setAttribute('data-tried', tried + 'jpeg,');
         img.src = currentSrc.substring(0, currentSrc.length - 4) + '.jpeg';
@@ -546,7 +601,6 @@ function imgError(img, name, category) {
         return;
     }
 
-    // Respaldo adaptado para el contenedor grande de la página de detalles
     if (img.getAttribute('data-fallback')) return;
     img.setAttribute('data-fallback', 'true');
     const initials = name ? name.substring(0, 15) : "Accesorio";
@@ -597,9 +651,10 @@ async function cargarDetalle() {
             <div class="col-img">
                 <div class="skeleton" id="img-sk" style="width:260px;height:340px;border-radius:16px;"></div>
                 <img class="foto-principal" id="foto-principal"
-                    src="${imgPadded}.jpg" alt="${prod.nombre}"
-                    onerror="imgError(this, '${prod.nombre}', '${nomCat}')"
-                    onload="this.style.display='block';document.getElementById('img-sk').style.display='none';">
+                     src="${imgPadded}.jpg" alt="${prod.nombre}"
+                     onerror="imgError(this, '${prod.nombre}', '${nomCat}')"
+                     onload="this.style.display='block';document.getElementById('img-sk').style.display='none';"
+                     onclick="abrirModal(this.src)">
             </div>
             <div class="col-info">
                 <span class="badge-cat">${nomCat}</span>
@@ -630,7 +685,7 @@ async function cargarDetalle() {
                 return `
                 <a class="prod-sim" href="detalle.html?id=${sPadded}">
                     <img src="${sPadded}.jpg" alt="${s.nombre}"
-                        onerror="imgError(this, '${s.nombre}', '${nomCat}')">
+                         onerror="imgError(this, '${s.nombre}', '${nomCat}')">
                     <span class="ps-nombre">${s.nombre}</span>
                     <span class="ps-precio">$${s.precio}</span>
                     <span class="ps-likes">❤️ ${sLikes}</span>
@@ -679,11 +734,10 @@ async function toggleLike(id) {
 
     // Enviar al servidor (sin bloquear la UI)
     try {
-        const res = await fetch(URL_API, {
+        const urlConParams = `${URL_API}?tipo=${encodeURIComponent(tipo)}&id=${encodeURIComponent(id)}&action=${encodeURIComponent(tipo)}`;
+        await fetch(urlConParams, {
             method: "POST",
-            mode: "no-cors",          // evita errores CORS con Apps Script
-            headers: {"Content-Type": "text/plain"},
-            body: JSON.stringify({ tipo: tipo, id: id })
+            mode: "no-cors"
         });
     } catch(e) {
         console.warn("Error de red al enviar like:", e);
@@ -745,6 +799,30 @@ function toggleMenu() {
 }
 window.addEventListener("DOMContentLoaded", sincronizar);
 window.addEventListener("storage", sincronizar);
+
+// Lightbox modal handlers
+function abrirModal(src) {
+    const modal = document.getElementById("modal-zoom");
+    const modalImg = document.getElementById("modal-img-content");
+    modalImg.src = src;
+    modal.classList.add("show");
+    document.body.style.overflow = "hidden";
+}
+function cerrarModal() {
+    const modal = document.getElementById("modal-zoom");
+    modal.classList.remove("show");
+    document.body.style.overflow = "";
+}
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") cerrarModal();
+});
 </script>
+
+<!-- Lightbox Modal para ampliar imagen -->
+<div id="modal-zoom" class="modal-zoom" onclick="cerrarModal()">
+    <button class="modal-close" onclick="cerrarModal()">&times;</button>
+    <img id="modal-img-content" class="modal-img-content" src="" alt="Imagen ampliada" onclick="event.stopPropagation()">
+</div>
+
 </body>
 </html>
