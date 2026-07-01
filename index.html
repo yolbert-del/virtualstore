@@ -144,8 +144,22 @@
         .producto:hover{box-shadow:0 16px 40px rgba(26,86,219,.12);transform:translateY(-5px);border-color:rgba(26,86,219,.35);}
         
         .imagen-wrapper{position:relative;width:100%;aspect-ratio:3/4;border-radius:14px;overflow:hidden;background:#f3f4f6;}
-        .foto-link{display:block;width:100%;height:100%;overflow:hidden;}
-        .foto-link img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s cubic-bezier(0.16, 1, 0.3, 1);}
+        .foto-link{
+            display:block;
+            width:150px;
+            height:200px;
+            overflow:hidden;
+            border-radius:12px;
+        }
+        .foto-link img{
+            width: 150px;;
+            height: 200px;;
+            object-fit:cover;
+            display:block;
+            border-radius:12px;
+            transition:transform .3s;
+        }
+
         .producto:hover .foto-link img{transform:scale(1.08);}
         
         /* Floating category tags matching the images perfectly */
@@ -470,7 +484,7 @@
                 return `<tr onclick="location.href='detalle.html?id=${paddedId}'" style="cursor:pointer;">
                     <td><span class="rank-num ${rc}">${medal}</span></td>
                     <td><img class="thumb-tabla" src="${paddedId}.jpg" alt="${p.nombre||id}"
-                             onerror="imgError(this, '${p.nombre || id}', 'Ranking')"></td>
+                    onerror="imgError(this, '${p.nombre || id}', 'Ranking')"></td>
                     <td><strong>${p.nombre||id}</strong></td>
                     <td>$${p.precio??0}</td>
                     <td>${p.stock??0}</td>
