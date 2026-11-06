@@ -596,8 +596,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ── CARGAR DETALLE ─────────────────────────────────
 async function cargarDetalle() {
     try {
-        const r  = await fetch(URL_API);
-        const ps = await r.json();
+        let ps = [];
+        try {
+            const r = await fetch(URL_API, {cache:"no-store"});
+            const data = await r.json();
+            if (Array.isArray(data)) ps = data;
+        } catch(e) { console.warn("API no disponible, usando datos locales", e); }
+        // Aceptar encabezados de la hoja tal cual (ID, cantidad, Nombre, etc.)
+        ps = ps.map(p => {
+            const g = (...ks) => { for (const k of ks) { if (p[k] !== undefined && p[k] !== "") return p[k]; } return undefined; };
+            return {
+                ...p,
+                id: String(g("id","ID","Id") ?? "").trim(),
+                nombre: g("nombre","Nombre","NOMBRE") ?? "",
+                precio: Number(g("precio","Precio","PRECIO") ?? 0),
+                stock: Number(g("stock","cantidad","Cantidad","Stock") ?? 0),
+                likes: parseInt(g("likes","Likes","LIKES")) || 0
+            };
+        });
+        console.log("Productos recibidos de la API:", ps);
 
         // Match using normalized ID (e.g., "gui-01" matches "gui-1")
         const prod = ps.find(p => normalizeId(p.id) === normalizeId(ID_ACT));
