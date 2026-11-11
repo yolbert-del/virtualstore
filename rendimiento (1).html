@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Panel de Rendimiento · Virtual Store</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--tx:#1f2937;--mut:#6b7280;--bd:#e5e7eb;--ac:#4f46e5;--bad:#dc2626;--ok:#16a34a}
+@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--card:#1e293b;--tx:#e5e7eb;--mut:#94a3b8;--bd:#334155}}
+*{box-sizing:border-box}
+body{font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--tx);margin:0;padding:16px}
+.wrap{max-width:1100px;margin:auto;display:none}
+header{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin-bottom:16px}
+h1{font-size:22px;margin:0}
+h2{font-size:15px;margin:0 0 12px}
+.btns a,.btns button{display:inline-block;background:var(--ac);color:#fff;border:0;padding:8px 14px;border-radius:8px;font-size:13px;text-decoration:none;cursor:pointer;margin-left:6px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px}
+.kpi small{color:var(--mut);font-size:12px}
+.kpi b{display:block;font-size:26px;margin-top:6px}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:16px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+input{padding:7px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx)}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--bd)}
+th{color:var(--mut);font-size:12px;cursor:pointer}
+.tag{padding:2px 8px;border-radius:99px;font-size:12px;color:#fff}
+.low{background:var(--bad)}.okk{background:var(--ok)}
+iframe{width:100%;height:600px;border:0;border-radius:8px}
+#msg{color:var(--mut);font-size:13px;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap" id="panel">
+  <header>
+    <h1>📊 Panel de Rendimiento · Virtual Store</h1>
+    <div class="btns">
+      <a id="ga4" target="_blank" rel="noopener">Google Analytics</a>
+      <a id="gsc" target="_blank" rel="noopener">Search Console</a>
+      <button onclick="cargar()">↻ Actualizar</button>
+    </div>
+  </header>
+  <div id="msg"></div>
+
+  <div class="kpis">
+    <div class="card kpi"><small>Productos</small><b id="k-prod">–</b></div>
+    <div class="card kpi"><small>Unidades en stock</small><b id="k-uni">–</b></div>
+    <div class="card kpi"><small>Stock bajo</small><b id="k-bajo" style="color:var(--bad)">–</b></div>
+    <div class="card kpi"><small>Agotados</small><b id="k-ago">–</b></div>
+    <div class="card kpi"><small>Categoría líder</small><b id="k-lider" style="font-size:20px">–</b></div>
+    <div class="card kpi"><small>Likes totales</small><b id="k-likes">–</b></div>
+    <div class="card kpi"><small>Valor del inventario</small><b id="k-valor">–</b></div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><h2>Unidades en stock por categoría</h2><canvas id="c-bar" height="140"></canvas></div>
+    <div class="card"><h2>Reparto de productos</h2><canvas id="c-pie"></canvas></div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px"><h2>❤️ Productos más gustados</h2><div id="top"></div></div>
+
+  <div class="card" style="margin-bottom:16px">
+    <h2>Inventario y alertas de reposición</h2>
+    <div class="tools">
+      <input id="buscar" placeholder="Buscar producto…" oninput="tabla()">
+      <label style="font-size:13px">Alerta si stock ≤ <input id="umbral" type="number" min="0" style="width:70px" oninput="cargarUmbral()"></label>
+    </div>
+    <div class="scroll"><table>
+      <thead><tr><th onclick="ordenar('nombre')">Producto</th><th onclick="ordenar('categoria')">Categoría</th><th onclick="ordenar('stock')">Stock</th><th onclick="ordenar('precio')">Precio</th><th onclick="ordenar('likes')">Likes</th><th>Estado</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div>
+  </div>
+
+  <div class="card" id="looker-box" style="display:none">
+    <h2>Tráfico y búsquedas (GA4 + Search Console)</h2>
+    <iframe id="looker" allowfullscreen></iframe>
+  </div>
+</div>
+
+<script>
+/* ===== CONFIGURACIÓN: edita solo esta parte ===== */
+const CONFIG = {
+  clave: "262729180221",
+  apiUrl: "https://script.google.com/macros/s/AKfycbzXDFi3mSBhq-dFm_QP6MpBrJOifXTsq0t19MsZqoSLzVEmR7l6yw7ZtuJRQ-_JRrhO/exec",
+  stockBajo: 3,
+  moneda: "$",
+  categorias: { ani:"Anillos", are:"Aretes", cad:"Cadenas", gui:"Guillos", pul:"Pulsas", jue:"Juegos", prod:"Hogar y belleza" },
+  ga4Url: "https://analytics.google.com/analytics/web/",
+  gscUrl: "https://search.google.com/search-console",
+  lookerEmbed: ""           // URL de "Insertar informe" de Looker Studio (opcional)
+};
+/* ================================================ */
+
+let datos = [], orden = {k:"stock", asc:true}, bar, pie;
+const $ = id => document.getElementById(id);
+
+if (prompt("Contraseña del panel:") === CONFIG.clave) {
+  $("panel").style.display = "block";
+  $("ga4").href = CONFIG.ga4Url; $("gsc").href = CONFIG.gscUrl;
+  $("umbral").value = localStorage.getItem("umbral") || CONFIG.stockBajo;
+  if (CONFIG.lookerEmbed) { $("looker").src = CONFIG.lookerEmbed; $("looker-box").style.display = "block"; }
+  cargar();
+} else { alert("Acceso denegado."); location.href = "index.html"; }
+
+function normalizar(j){
+  const filas = Array.isArray(j) ? j : (j.data || j.productos || []);
+  return filas.map(p=>{
+    const id = String(p.id||"").trim().toLowerCase();
+    return { id, nombre:String(p.nombre||id), categoria:CONFIG.categorias[id.split("-")[0]]||"Otros",
+             stock:Number(p.stock)||0, precio:Number(p.precio)||0, likes:parseInt(p.likes)||0 };
+  }).filter(d=>d.id);
+}
+
+async function cargar(){
+  $("msg").textContent = "Cargando datos…";
+  try {
+    const r = await fetch(CONFIG.apiUrl, {cache:"no-store"});
+    datos = normalizar(await r.json());
+    $("msg").textContent = datos.length ? "Actualizado: " + new Date().toLocaleString("es-DO") : "Me conecté a tu tienda pero no llegaron productos.";
+    render();
+  } catch(e){ $("msg").textContent = "No pude leer los datos de tu tienda. Revisa tu conexión e inténtalo de nuevo."; }
+}
+
+function cargarUmbral(){ localStorage.setItem("umbral",$("umbral").value); render(); }
+const umbral = () => parseFloat($("umbral").value)||0;
+
+function render(){
+  const cat = {}, cnt = {};
+  datos.forEach(d=>{ cat[d.categoria]=(cat[d.categoria]||0)+d.stock; cnt[d.categoria]=(cnt[d.categoria]||0)+1; });
+  const nombres = Object.keys(cat);
+  const lider = nombres.slice().sort((a,b)=>cat[b]-cat[a])[0] || "–";
+  $("k-prod").textContent = datos.length;
+  $("k-uni").textContent = datos.reduce((s,d)=>s+d.stock,0);
+  $("k-bajo").textContent = datos.filter(d=>d.stock>0&&d.stock<=umbral()).length;
+  $("k-ago").textContent = datos.filter(d=>d.stock===0).length;
+  $("k-lider").textContent = lider;
+  $("k-likes").textContent = datos.reduce((s,d)=>s+d.likes,0);
+  $("k-valor").textContent = CONFIG.moneda+datos.reduce((s,d)=>s+d.stock*d.precio,0).toLocaleString("es-DO");
+  const top = datos.filter(d=>d.likes>0).sort((a,b)=>b.likes-a.likes).slice(0,5);
+  $("top").innerHTML = top.length ? top.map((d,i)=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd)"><span>${i+1}. ${esc(d.nombre)} <small style="color:var(--mut)">· ${esc(d.categoria)}</small></span><b>${d.likes} ❤️</b></div>`).join("") : "<span style='color:var(--mut)'>Aún no hay likes.</span>";
+  const colores = ["#4f46e5","#9333ea","#16a34a","#eab308","#f97316","#0ea5e9","#ec4899","#64748b"];
+  if(bar)bar.destroy(); if(pie)pie.destroy();
+  bar = new Chart($("c-bar"),{type:"bar",data:{labels:nombres,datasets:[{label:"Unidades",data:nombres.map(n=>cat[n]),backgroundColor:colores,borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+  pie = new Chart($("c-pie"),{type:"doughnut",data:{labels:nombres,datasets:[{data:nombres.map(n=>cnt[n]),backgroundColor:colores}]},options:{plugins:{legend:{position:"bottom"}}}});
+  tabla();
+}
+
+function ordenar(k){ orden = {k, asc: orden.k===k ? !orden.asc : true}; tabla(); }
+
+function tabla(){
+  const q = $("buscar").value.toLowerCase();
+  const filas = datos.filter(d=>d.nombre.toLowerCase().includes(q)||d.categoria.toLowerCase().includes(q))
+    .sort((a,b)=>{ const x=a[orden.k], y=b[orden.k]; return (x>y?1:x<y?-1:0)*(orden.asc?1:-1); });
+  $("tbody").innerHTML = filas.map(d=>{
+    const bajo = d.stock<=umbral();
+    return `<tr><td>${esc(d.nombre)}</td><td>${esc(d.categoria)}</td><td>${d.stock}</td><td>${CONFIG.moneda}${d.precio}</td><td>${d.likes}</td><td><span class="tag ${bajo?"low":"okk"}">${d.stock===0?"Agotado":bajo?"Reponer":"OK"}</span></td></tr>`;
+  }).join("");
+}
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+</script>
+</body>
+</html>

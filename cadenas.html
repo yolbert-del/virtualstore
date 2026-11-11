@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-M85M59HT"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadenas – Virtual Store</title>
@@ -434,9 +442,44 @@
         <a href="juegos.html" class="boton_azul">Juegos</a>
     </div>
     <div class="divider"></div>
-    <p class="aviso">⚠️ no hay Accesorios disponibles</p>
+    <p class="aviso">⚠️ espera a que cargue las imagenes</p>
     <div class="galeria">
         
+        <div class="producto">
+                <a class="foto-link" href="detalle.html?id=cadena-50">
+                <img src="cad-50.jpg" alt="cadena" onerror="imgError(this, 'cadena (50)', 'Cocina')">
+                </a>
+            <p class="precio-tag"><strong id="precio-cadena-50">$350</strong></p>
+            <p class="nombre-prod" id="ID-cadena-50">cadena (IQ:50)</p>
+            <p class="stock-tag">Disp: <span id="stock-cadena-50">1</span></p>
+            <p class="likes-tag" id="likes-cadena-50">0 ❤️</p>
+            <button class="btn-add" id="boton-cadena-50" onclick="carrito('cad-50','cadena (IQ:50)',350)">🛒 Agregar</button>
+            <a class="ver-det" href="detalle.html?id=cad-50">Ver detalle →</a>
+        </div>
+
+        <div class="producto">
+                <a class="foto-link" href="detalle.html?id=cadena-51">
+                <img src="cad-51.jpg" alt="cadena" onerror="imgError(this, 'cadena (51)', 'Cocina')">
+                </a>
+            <p class="precio-tag"><strong id="precio-cadena-51">$350</strong></p>
+            <p class="nombre-prod" id="ID-cadena-51">cadena (IQ:51)</p>
+            <p class="stock-tag">Disp: <span id="stock-cadena-51">1</span></p>
+            <p class="likes-tag" id="likes-cadena-51">0 ❤️</p>
+            <button class="btn-add" id="boton-cadena-51" onclick="carrito('cad-51','cadena (IQ:51)',350)">🛒 Agregar</button>
+            <a class="ver-det" href="detalle.html?id=cad-51">Ver detalle →</a>
+        </div>
+
+        <div class="producto">
+                <a class="foto-link" href="detalle.html?id=cadena-52">
+                <img src="cad-52.jpg" alt="cadena" onerror="imgError(this, 'cadena (52)', 'Cocina')">
+                </a>
+            <p class="precio-tag"><strong id="precio-cadena-52">$350</strong></p>
+            <p class="nombre-prod" id="ID-cadena-52">cadena (IQ:52)</p>
+            <p class="stock-tag">Disp: <span id="stock-cadena-52">1</span></p>
+            <p class="likes-tag" id="likes-cadena-52">0 ❤️</p>
+            <button class="btn-add" id="boton-cadena-52" onclick="carrito('cad-52','cadena (IQ:52)',350)">🛒 Agregar</button>
+            <a class="ver-det" href="detalle.html?id=cad-52">Ver detalle →</a>
+        </div>
     </div>
 </div>
 <script>

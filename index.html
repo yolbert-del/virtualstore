@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-M85M59HT"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Virtual Store</title>
@@ -661,6 +669,7 @@
         <div id="menu-opciones">
             <a href="index.html" class="menu-item"><span>🏠</span> Inicio</a>
             <a href="herramientas.html" class="menu-item"><span>🛠️</span> Herramientas</a>
+            <a href="politica-de-privacidad.html" class="menu-item"><span>🔒</span> Política de Privacidad</a>
             <a href="https://drive.google.com/file/d/1ltdaKDxm6FY7PKB45L48OGtSByivkMKb/view?usp=drive_link" class="menu-item"><span>🛍️</span> Catálogo Fashion & Home</a>
             <ul><li><button class="menu-item" onclick="toggleFondo()"><span>🌓</span> Tema</button></li></ul>
         </div>
@@ -678,11 +687,11 @@
     <div class="divider"></div>
     <div class="stats-bar">
         <div class="stat">
-            <div class="stat-num">6</div>
+            <div class="stat-num">63</div>
             <div class="stat-label">Accesorios Totales</div>
         </div>
         <div class="stat">
-            <div class="stat-num">2/11/2026</div>
+            <div class="stat-num">11/11/2026</div>
             <div class="stat-label">Última Actualización</div>
         </div>
     </div>
@@ -858,6 +867,18 @@
             <p class="likes-tag" id="likes-prod-12">0 ❤️</p>
             <button class="btn-add" id="boton-prod-12" onclick="carrito('prod-12','SCORE (IQ:12)',0)">🛒 Agregar</button>
             <a class="ver-det" href="detalle.html?id=prod-12">Ver detalle →</a>
+        </div>
+
+        <div class="producto">
+                <a class="foto-link" href="detalle.html?id=prod-14">
+                <img src="prod-14.jpg" alt="Reloj" onerror="imgError(this, 'Reloj (14)', 'Belleza')">
+                </a>
+            <p class="precio-tag"><strong id="precio-prod-14">$1000</strong></p>
+            <p class="nombre-prod" id="ID-prod-14">Reloj(IQ:14)</p>
+            <p class="stock-tag">Disp: <span id="stock-prod-14">1</span></p>
+            <p class="likes-tag" id="likes-prod-14">0 ❤️</p>
+            <button class="btn-add" id="boton-prod-14" onclick="carrito('prod-14','Reloj (IQ:14)',1000)">🛒 Agregar</button>
+            <a class="ver-det" href="detalle.html?id=prod-14">Ver detalle →</a>
         </div>
     </div>
 </div>
