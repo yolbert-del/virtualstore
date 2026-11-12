@@ -583,7 +583,17 @@ function imgError(img, name, category) {
     img.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="260" height="340" viewBox="0 0 260 340"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%231a56db"/><stop offset="100%" stop-color="%237c3aed"/></linearGradient></defs><rect width="100%" height="100%" fill="url(%23g)"/><circle cx="130" cy="140" r="50" fill="none" stroke="white" stroke-width="5" opacity="0.7"/><polygon points="130,105 155,150 105,150" fill="none" stroke="%23f59e0b" stroke-width="4" opacity="0.9"/><text x="50%" y="250" font-family="'DM Sans',sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">${encodeURIComponent(initials)}</text><text x="50%" y="278" font-family="'DM Sans',sans-serif" font-size="12" fill="%23dde3f5" text-anchor="middle" opacity="0.8">${encodeURIComponent(catText)}</text></svg>`;
 }
 
-function prefijo(id){ return (id.match(/^([a-z]+)/i)||["",""])[1].toLowerCase(); }
+// Alias de prefijos largos -> prefijo corto usado en la hoja (ej: "cadena-50" -> "cad-50")
+const ALIAS = {
+    cadena:"cad", cadenas:"cad", anillo:"ani", anillos:"ani",
+    arete:"are", aretes:"are", guillo:"gui", guillos:"gui",
+    pulsa:"pul", pulsas:"pul", juego:"jue", juegos:"jue", producto:"prod", oferta:"prod"
+};
+function prefijo(id){
+    const p = (String(id||"").match(/^([a-z]+)/i)||["",""])[1].toLowerCase();
+    return ALIAS[p] || p;
+}
+function numeroId(id){ const m = String(id||"").match(/(\d+)\s*$/); return m ? parseInt(m[1], 10) : null; }
 
 // ── INICIAR ────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", async () => {
@@ -617,10 +627,17 @@ async function cargarDetalle() {
         console.log("Productos recibidos de la API:", ps);
 
         // Match using normalized ID (e.g., "gui-01" matches "gui-1")
-        const prod = ps.find(p => normalizeId(p.id) === normalizeId(ID_ACT));
+        let prod = ps.find(p => normalizeId(p.id) === normalizeId(ID_ACT));
+        // Respaldo: mismo número de ID (los números son únicos en toda la hoja) y prefijo equivalente
+        if (!prod) {
+            const n = numeroId(ID_ACT);
+            if (n !== null) prod = ps.find(p => numeroId(p.id) === n && prefijo(p.id) === prefijo(ID_ACT))
+                                || ps.find(p => numeroId(p.id) === n);
+        }
+        if (!prod && ps.length === 0) { mostrarError("No se pudo cargar el catálogo (API sin respuesta). Recarga la página."); return; }
         if (!prod) { mostrarError("Accesorio no encontrado."); return; }
 
-        const cat    = prefijo(ID_ACT);
+        const cat    = prefijo(prod.id);
         const pagOri = PAGINAS[cat]    || "index.html";
         const nomCat = NOMBRES_CAT[cat]|| "Accesorios";
         
@@ -633,7 +650,7 @@ async function cargarDetalle() {
         document.getElementById("btn-volver").textContent = "← Volver a " + nomCat;
 
         // Image source resolved with padded ID (e.g. "gui-01.jpg")
-        const imgPadded = getPaddedId(ID_ACT);
+        const imgPadded = getPaddedId(prod.id);
 
         // Overlay local like to count
         const finalLikes = (yaLike && (prod.likes || 0) === 0) ? 1 : (prod.likes || 0);
@@ -667,7 +684,7 @@ async function cargarDetalle() {
 
         // Similares
         const similares = ps.filter(p =>
-            normalizeId(p.id) !== normalizeId(ID_ACT) &&
+            normalizeId(p.id) !== normalizeId(prod.id) &&
             prefijo(p.id) === cat
         );
         if (similares.length > 0) {
